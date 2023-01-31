@@ -13,16 +13,11 @@ plugins {
 
 group = "survival1sm.survival1sm.fakerpojo"
 version = "0.0.1"
+archivesBaseName = "fakerpojo"
 
 repositories {
-    maven {
-        url "https://artifactory.global.dish.com/artifactory/repo"
-        metadataSources {
-            mavenPom()
-            artifact()
-            ignoreGradleMetadataRedirection()
-        }
-    }
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
 }
 
 dependencies {
