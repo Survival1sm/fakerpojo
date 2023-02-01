@@ -9,11 +9,68 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
-group = "survival1sm.survival1sm.fakerpojo"
+group = "io.github.survival1sm"
 version = "0.0.1"
 archivesBaseName = "fakerpojo"
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'fakerpojo'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Faker Pojo'
+                description = 'Generate Pojos with fake data'
+                url = 'https://github.com/Survival1sm/fakerpojo'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Survival1sm'
+                        name = 'James Doyle'
+                        email = 'james.r.doyle21@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Survival1sm/fakerpojo.git'
+                    developerConnection = 'scm:git:ssh://github.com/Survival1sm/fakerpojo.git'
+                    url = 'https://github.com/Survival1sm/fakerpojo/'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            credentials(PasswordCredentials)
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
 
 repositories {
     // Use Maven Central for resolving dependencies.
