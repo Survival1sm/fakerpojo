@@ -1,9 +1,5 @@
 # Faker Pojo
 
-[![Maven Status](https://maven-badges.herokuapp.com/maven-central/net.datafaker/datafaker/badge.svg?style=flat)](http://mvnrepository.com/artifact/net.datafaker/datafaker)
-[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![codecov](https://codecov.io/gh/datafaker-net/datafaker/branch/main/graph/badge.svg?token=FJ6EXMUTFD)](https://codecov.io/gh/datafaker-net/datafaker)
-
 This library uses [datafaker](https://github.com/datafaker-net/datafaker) to create Java Objects populated with
 fake data.
 
@@ -25,7 +21,7 @@ In the pom.xml, add the following fragment to the `dependencies` section:
 <dependency>
     <groupId>io.github.survival1sm</groupId>
     <artifactId>fakerpojo</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -33,7 +29,7 @@ For Gradle users, add the following to your build.gradle file.
 
 ```groovy
 dependencies {
-    implementation 'io.github.survival1sm:fakerpojo:0.0.1'
+    implementation 'io.github.survival1sm:fakerpojo:0.0.2'
 }
 
 ```
@@ -45,18 +41,14 @@ In your Java code:
 ```java
 public class FakerPojo {
 
-	public FakerPojo(String someStringProperty, String firstName, Instant lastUpdatedAt, List<Integer> projectIdList) {
-		this.someStringProperty = someStringProperty;
-		this.firstName = firstName;
-		this.lastUpdatedAt = lastUpdatedAt;
-		this.projectIdList = projectIdList;
+	public FakerPojo() {
 	}
 
-	private final String someStringProperty;
+	private String someStringProperty;
 	@FakerField(type = Type.FIRST_NAME)
-	private final String firstName;
-	private final Instant lastUpdatedAt;
-	private final List<Integer> projectIdList;
+	private String firstName;
+	private Instant lastUpdatedAt;
+	private List<Integer> projectIdList;
 
 	//...getters
 }
@@ -64,16 +56,16 @@ public class FakerPojo {
 
 ```java
 @Test
-void someTest()throws Exception{
-		MyPojo myPojo=Faker.Builder
-		.fromPojo(MyPojo.class)
-		.getFirst()
-		.build();
+void someTest() throws Exception {
+    MyPojo myPojo = Faker.Builder
+      .fromPojo(MyPojo.class)
+      .getFirst()
+      .build();
 
-		System.out.println(myPojo.toString());
+    System.out.println(myPojo.toString());
 
 // FakerPojo{someStringProperty='Dolore et ', firstName='Rigoberto', lastUpdatedAt=2019-07-05T02:37:58.910Z, projectIdList=[228099, 443978]}
-		}
+}
 ```
 
 ### Builder Options
@@ -104,10 +96,10 @@ Add your custom types to the existing types:
 ```java
 public class TestTypes extends Type {
 
-	public static final String EMPLOYEE_NUMBER = "EMPLOYEE_NUMBER";
-	public static final String EMPLOYEE_NUMBER_STRING = "EMPLOYEE_NUMBER_STRING";
-	public static final String TYPE_NANOID = "TYPE_NANOID";
-	public static final String LIST_PROJECT_NANOID = "LIST_PROJECT_NANOID";
+  public static final String EMPLOYEE_NUMBER = "EMPLOYEE_NUMBER";
+  public static final String EMPLOYEE_NUMBER_STRING = "EMPLOYEE_NUMBER_STRING";
+  public static final String TYPE_NANOID = "TYPE_NANOID";
+  public static final String LIST_PROJECT_NANOID = "LIST_PROJECT_NANOID";
 }
 ```
 
@@ -116,21 +108,19 @@ Provide an implementation of FieldValueGenerator for your new types:
 ```java
 public class TestValueGenerators {
 
-	private static final Faker faker = new Faker();
+  private static final Faker faker = new Faker();
 
-	public static FieldValueGenerator employeeNumberValueGenerator = (FakerFieldProps fieldProps) -> faker.number().numberBetween(20, 1200000);
+  public static FieldValueGenerator employeeNumberValueGenerator = (FakerFieldProps fieldProps) -> faker.number().numberBetween(20, 1200000);
 
-	public static FieldValueGenerator employeeNumberStringValueGenerator = (FakerFieldProps fieldProps) -> String.valueOf(faker.number().numberBetween(20, 1200000));
+  public static FieldValueGenerator employeeNumberStringValueGenerator = (FakerFieldProps fieldProps) -> String.valueOf(faker.number().numberBetween(20, 1200000));
 
-	public static FieldValueGenerator typeNanoIdValueGenerator = (FakerFieldProps fieldProps) -> NanoIdService.getNanoId(NanoPrefix.type);
+  public static FieldValueGenerator typeNanoIdValueGenerator = (FakerFieldProps fieldProps) -> NanoIdService.getNanoId(NanoPrefix.type);
 
-	public static FieldValueGenerator listProjectNanoIdValueGenerator = (FakerFieldProps fieldProps) -> {
-		IntStream range = IntStream.range(0, fieldProps.getRecords());
+  public static FieldValueGenerator listProjectNanoIdValueGenerator = (FakerFieldProps fieldProps) -> {
+      IntStream range = IntStream.range(0, fieldProps.getRecords());
 
-		return range
-				.mapToObj((int i) -> NanoIdService.getNanoId(NanoPrefix.project))
-				.collect(Collectors.toList());
-	};
+      return range.mapToObj((int i) -> NanoIdService.getNanoId(NanoPrefix.project)).collect(Collectors.toList());
+  };
 }
 ```
 
@@ -139,11 +129,11 @@ Register your new types:
 ```java
   @BeforeAll
 static void addTestValueGenerator(){
-		FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER,TestValueGenerators.employeeNumberValueGenerator);
-		FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER_STRING,TestValueGenerators.employeeNumberStringValueGenerator);
-		FakerPojo.addFieldValuesGenerator(TestTypes.TYPE_NANOID,TestValueGenerators.typeNanoIdValueGenerator);
-		FakerPojo.addFieldValuesGenerator(TestTypes.LIST_PROJECT_NANOID,TestValueGenerators.listProjectNanoIdValueGenerator);
-		}
+  FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER,TestValueGenerators.employeeNumberValueGenerator);
+  FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER_STRING,TestValueGenerators.employeeNumberStringValueGenerator);
+  FakerPojo.addFieldValuesGenerator(TestTypes.TYPE_NANOID,TestValueGenerators.typeNanoIdValueGenerator);
+  FakerPojo.addFieldValuesGenerator(TestTypes.LIST_PROJECT_NANOID,TestValueGenerators.listProjectNanoIdValueGenerator);
+}
 ```
 
 Use your custom types
@@ -151,22 +141,17 @@ Use your custom types
 ```java
 public class CustomValueGeneratorTestDomain {
 
-	public CustomValueGeneratorTestDomain(Integer testEmployeeNumber, String testEmployeeNumberString,
-																				String testNanoId, List<String> testNanoIdList) {
-		this.testEmployeeNumber = testEmployeeNumber;
-		this.testEmployeeNumberString = testEmployeeNumberString;
-		this.testNanoId = testNanoId;
-		this.testNanoIdList = testNanoIdList;
-	}
+  public CustomValueGeneratorTestDomain() {
+  }
 
-	@FakerField(type = TestTypes.EMPLOYEE_NUMBER)
-	private final Integer testEmployeeNumber;
-	@FakerField(type = TestTypes.EMPLOYEE_NUMBER_STRING)
-	private final String testEmployeeNumberString;
-	@FakerField(type = TestTypes.TYPE_NANOID)
-	private final String testNanoId;
-	@FakerField(type = TestTypes.LIST_PROJECT_NANOID)
-	private final List<String> testNanoIdList;
+  @FakerField(type = TestTypes.EMPLOYEE_NUMBER)
+  private final Integer testEmployeeNumber;
+  @FakerField(type = TestTypes.EMPLOYEE_NUMBER_STRING)
+  private final String testEmployeeNumberString;
+  @FakerField(type = TestTypes.TYPE_NANOID)
+  private final String testNanoId;
+  @FakerField(type = TestTypes.LIST_PROJECT_NANOID)
+  private final List<String> testNanoIdList;
 
 	// .. getters
 }
@@ -175,10 +160,13 @@ public class CustomValueGeneratorTestDomain {
 ```java
 @Test
 void build_custom_value_generator_returns_expected_values()throws Exception{
-		CustomValueGeneratorTestDomain test=Builder.fromPojo(CustomValueGeneratorTestDomain.class).getFirst().build();
+  CustomValueGeneratorTestDomain test = FakerPojo.Builder
+      .fromPojo(CustomValueGeneratorTestDomain.class)
+      .getFirst()
+      .build();
 
-		System.out.println(test.toString());
-		}
+  System.out.println(test.toString());
+}
 
 // CustomValueGeneratorTestDomain{testEmployeeNumber=1038479, testEmployeeNumberString='651836', testNanoId='TYP-ltwtfbRFst', testNanoIdList=[PRJ-vNB8cnxlPk, PRJ-5CG0RSpDx4]}
 ```
@@ -189,8 +177,8 @@ Usage with Locales
 ```java
 @BeforeAll
 static void setFakerLocale(){
-		FakerPojo.setLocale(new Locale("en","US"));
-		}
+    FakerPojo.setLocale(new Locale("en","US"));
+}
 ```
 
 Types

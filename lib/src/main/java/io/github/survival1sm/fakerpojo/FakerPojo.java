@@ -18,6 +18,22 @@ import java.util.*;
 
 public class FakerPojo {
 
+	public static void resetDefaultFakerFieldProps() {
+		PojoDataService.defaultFakerFieldProps = new DefaultFakerFieldProps();
+	}
+
+	public static void setDefaultFakerFieldProps(FakerFieldProps fakerFieldProps) {
+
+		PojoDataService.defaultFakerFieldProps.setLength(fakerFieldProps.getLength());
+		PojoDataService.defaultFakerFieldProps.setDecimals(fakerFieldProps.getDecimals());
+		PojoDataService.defaultFakerFieldProps.setMin(fakerFieldProps.getMin());
+		PojoDataService.defaultFakerFieldProps.setMax(fakerFieldProps.getMax());
+		PojoDataService.defaultFakerFieldProps.setRecords(fakerFieldProps.getRecords());
+		PojoDataService.defaultFakerFieldProps.setFrom(fakerFieldProps.getFrom());
+		PojoDataService.defaultFakerFieldProps.setTo(fakerFieldProps.getTo());
+		PojoDataService.defaultFakerFieldProps.setChronoUnit(fakerFieldProps.getChronoUnit());
+	}
+
 	/**
 	 * Set the {@link Locale} for the underlying {@link net.datafaker.Faker}
 	 *
@@ -116,7 +132,7 @@ public class FakerPojo {
 				@Override
 				public T build() throws NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException, ParseException, ClassNotFoundException {
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = new DefaultFakerFieldProps().withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
 
 					return (T) PojoDataService.createFakeField(fieldProps, this.baseClass, null);
 				}
@@ -153,7 +169,7 @@ public class FakerPojo {
 					List<T> outputList = new ArrayList<>();
 
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = new DefaultFakerFieldProps().withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
 
 					int i = 0;
 					while (i < this.records) {
@@ -198,7 +214,7 @@ public class FakerPojo {
 					Set<T> outputList = new HashSet<>();
 
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = new DefaultFakerFieldProps().withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
 
 					int i = 0;
 					while (i < this.records) {

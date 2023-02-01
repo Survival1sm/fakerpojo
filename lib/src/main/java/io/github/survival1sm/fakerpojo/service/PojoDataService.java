@@ -4,11 +4,11 @@ import io.github.survival1sm.fakerpojo.FakerPojo.Builder;
 import io.github.survival1sm.fakerpojo.annotations.FakerField;
 import io.github.survival1sm.fakerpojo.domain.DefaultFakerFieldProps;
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
-import io.github.survival1sm.fakerpojo.exceptions.NoAllArgsConstructorException;
 import io.github.survival1sm.fakerpojo.util.Utilities;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -18,6 +18,8 @@ import java.util.*;
 import static io.github.survival1sm.fakerpojo.domain.Type.*;
 
 public class PojoDataService {
+
+	public static DefaultFakerFieldProps defaultFakerFieldProps = new DefaultFakerFieldProps();
 
 	public static Faker faker = new Faker();
 
@@ -48,33 +50,41 @@ public class PojoDataService {
 	public static <T> T createFakePojo(Class<T> baseClass, Map<String, Object> overrides) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, ParseException, ClassNotFoundException {
 		final List<Field> allFields = Utilities.getAllFieldsFromClassAndSuperclass(baseClass);
 		final List<Class<?>> fieldClassList = new ArrayList<>();
-		final List<Object> fieldDataList = new ArrayList<>();
+		final Map<Field, Object> fieldDataList = new LinkedHashMap<>();
 
 		for (Field field : allFields) {
 			fieldClassList.add(field.getType());
 
-			FakerFieldProps fieldProps = Optional.ofNullable(field.getAnnotation(FakerField.class))
-					.map(Utilities::copyAnnotationToFieldProps)
+			Pair<Class<?>, FakerFieldProps> fieldProps = Optional.ofNullable(field.getAnnotation(FakerField.class))
+					.map(annotation -> Utilities.copyAnnotationToFieldProps(baseClass, annotation))
 					.orElse(Utilities.generateDefaultFieldProps(baseClass, field));
 
 			field.trySetAccessible();
 
 			if (overrides.containsKey(field.getName())) {
-				fieldDataList.add(overrides.get(field.getName()));
+				fieldDataList.put(field, overrides.get(field.getName()));
 			} else {
-				fieldDataList.add(createFakeField(fieldProps, baseClass, field));
+				fieldDataList.put(field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
 			}
 		}
 
-		try {
+		if (baseClass.isRecord()) {
 			baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()])).trySetAccessible();
-		} catch (NoSuchMethodException exception) {
-			throw new NoAllArgsConstructorException(
-					"Pojo %s does not have an All Args Constructor!".formatted(baseClass.getName()));
+
+			Constructor constructor = baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()]));
+
+			return baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()]))
+					.newInstance(fieldDataList.values().toArray());
 		}
 
-		return baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()]))
-				.newInstance(fieldDataList.toArray());
+		T fakeData = baseClass.getDeclaredConstructor().newInstance();
+
+		for (Map.Entry<Field, Object> field : fieldDataList.entrySet()) {
+			field.getKey().trySetAccessible();
+			field.getKey().set(fakeData, field.getValue());
+		}
+
+		return fakeData;
 	}
 
 	/**
@@ -280,7 +290,7 @@ public class PojoDataService {
 		final Map<Object, Object> newMap = new HashMap<>();
 
 		List<Object> keyList = new ArrayList<>();
-		FakerFieldProps keyFieldProps = new DefaultFakerFieldProps().withType(STRING);
+		FakerFieldProps keyFieldProps = PojoDataService.defaultFakerFieldProps.withType(STRING);
 
 		int i = 0;
 		while (i < fieldProps.getRecords()) {
@@ -294,7 +304,7 @@ public class PojoDataService {
 
 		Pair<String, java.lang.reflect.Type> fakerValueType = Utilities.determineFakerValueTypeFromField(field);
 
-		FakerFieldProps valueFieldProps = new DefaultFakerFieldProps().withType(fakerValueType.getKey());
+		FakerFieldProps valueFieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerValueType.getKey());
 
 		i = 0;
 		while (i < fieldProps.getRecords()) {

@@ -5,14 +5,12 @@ import java.util.Map;
 
 public class ListMapTestDomain {
 
-  private final List<Map<String, ClassTestDomain>> mapStringDomainList;
+	private List<Map<String, ClassTestDomain>> mapStringDomainList;
 
-  public ListMapTestDomain(
-      List<Map<String, ClassTestDomain>> mapStringDomainList) {
-    this.mapStringDomainList = mapStringDomainList;
-  }
+	public ListMapTestDomain() {
+	}
 
-  public List<Map<String, ClassTestDomain>> getMapStringDomainList() {
-    return mapStringDomainList;
-  }
+	public List<Map<String, ClassTestDomain>> getMapStringDomainList() {
+		return mapStringDomainList;
+	}
 }

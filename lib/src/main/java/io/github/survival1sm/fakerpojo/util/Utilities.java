@@ -4,6 +4,7 @@ import io.github.survival1sm.fakerpojo.annotations.FakerField;
 import io.github.survival1sm.fakerpojo.domain.DefaultFakerFieldProps;
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
 import io.github.survival1sm.fakerpojo.domain.Type;
+import io.github.survival1sm.fakerpojo.service.PojoDataService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,7 +20,7 @@ public class Utilities {
 	 * @param fakerFieldAnnotation The {@link FakerField} annotated to the field
 	 * @return A {@link FakerFieldProps} containing the property values of the annotation
 	 */
-	public static FakerFieldProps copyAnnotationToFieldProps(FakerField fakerFieldAnnotation) {
+	public static <T> ImmutablePair<Class<?>, FakerFieldProps> copyAnnotationToFieldProps(Class<T> baseClass, FakerField fakerFieldAnnotation) {
 		final FakerFieldProps fakerFieldProps = new FakerFieldProps();
 
 		fakerFieldProps.setType(fakerFieldAnnotation.type());
@@ -32,7 +33,7 @@ public class Utilities {
 		fakerFieldProps.setTo(fakerFieldAnnotation.to());
 		fakerFieldProps.setChronoUnit(fakerFieldAnnotation.chronoUnit());
 
-		return fakerFieldProps;
+		return new ImmutablePair<>(baseClass, fakerFieldProps);
 	}
 
 	/**
@@ -142,17 +143,17 @@ public class Utilities {
 	 * @throws ClassNotFoundException If we made an error determining the {@link Type} for the {@link Field}
 	 * @throws InstantiationException If we are unable to determine the {@link Type} from the {@link Field}
 	 */
-	public static <T> FakerFieldProps generateDefaultFieldProps(Class<T> baseClass, Field field) throws ClassNotFoundException, InstantiationException {
+	public static <T> ImmutablePair<Class<?>, FakerFieldProps> generateDefaultFieldProps(Class<T> baseClass, Field field) throws ClassNotFoundException, InstantiationException {
 		if (field.getGenericType() instanceof ParameterizedType parameterizedType) {
 			if (parameterizedType.getActualTypeArguments().length > 1) {
-				return new DefaultFakerFieldProps().withType(Type.MAP);
+				return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(Type.MAP));
 			}
 
 			if (parameterizedType.getActualTypeArguments().length == 1) {
 				String[] paramTypePackageArray = parameterizedType.getRawType().getTypeName().split("\\.");
 
 				String type = paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase();
-				return new DefaultFakerFieldProps().withType(type);
+				return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(type));
 			}
 			String fakerType =
 					Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(baseClass))
@@ -165,17 +166,16 @@ public class Utilities {
 						field.getName()));
 			}
 
-			return new DefaultFakerFieldProps().withType(fakerType);
+			return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(fakerType));
 		}
 		if (field.getType().isEnum()) {
-			return new DefaultFakerFieldProps().withType(Type.ENUM);
+			return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(Type.ENUM));
 		}
 		String fakerType = Utilities.determineFakerValueTypeFromClass(field.getType());
 		if (fakerType == null) {
-			throw new InstantiationException("Unable to automatically determine faker type for field %s".formatted(
-					field.getName()));
+			return new ImmutablePair<>(field.getType(), PojoDataService.defaultFakerFieldProps.withType(Type.CLASS));
 		}
 
-		return new DefaultFakerFieldProps().withType(fakerType);
+		return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(fakerType));
 	}
 }
