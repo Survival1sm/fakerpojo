@@ -12,6 +12,7 @@ public class FakerFieldProps {
   private int records;
   private String from;
   private String to;
+  private ChronoUnit chronoUnit;
 
   public ChronoUnit getChronoUnit() {
     return chronoUnit;
@@ -20,8 +21,6 @@ public class FakerFieldProps {
   public void setChronoUnit(ChronoUnit chronoUnit) {
     this.chronoUnit = chronoUnit;
   }
-
-  private ChronoUnit chronoUnit;
 
   public String getType() {
     return type;

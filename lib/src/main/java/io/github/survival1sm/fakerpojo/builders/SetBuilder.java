@@ -1,6 +1,7 @@
 package io.github.survival1sm.fakerpojo.builders;
 
-import io.leangen.geantyref.AnnotationFormatException;
+import io.github.survival1sm.fakerpojo.annotations.FakerField;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Map;
@@ -8,14 +9,39 @@ import java.util.Set;
 
 public interface SetBuilder<T> {
 
-  SetBuilder<T> withOverrides(Map<String, Object> overrides);
+	/**
+	 * Use the provided key to find the matching {@link java.lang.reflect.Field} by name and override it's generated value
+	 *
+	 * @param overrides A String key matching the field name and an Object value to use as an override
+	 */
+	SetBuilder<T> withOverrides(Map<String, Object> overrides);
 
-  SetBuilder<T> withRecords(Integer records);
+	/**
+	 * Determines the length of the returned Set
+	 *
+	 * @param records The number of fake Pojo's to be returned to the Set
+	 */
+	SetBuilder<T> withRecords(Integer records);
 
-  SetBuilder<T> withUniqueOnKey(String key);
+	/**
+	 * Ensure the data generated is globally unique on the provided key, useful for inserting into databases.
+	 *
+	 * @param key A String key matching a {@link java.lang.reflect.Field} name
+	 */
+	SetBuilder<T> withUniqueOnKey(String key);
 
-  Set<T> build()
-      throws NoSuchFieldException, IllegalAccessException, ParseException, InvocationTargetException,
-      NoSuchMethodException, InstantiationException, ClassNotFoundException, AnnotationFormatException;
+	/**
+	 * Apply the builder arguments and build a {@link Set} of fake Pojo's
+	 *
+	 * @return A {@link Set} of fake Pojo's with type {@link T}
+	 * @throws NoSuchFieldException      When a field cannot be retrieved from a Pojo Class
+	 * @throws InstantiationException    When a {@link io.github.survival1sm.fakerpojo.domain.Type} cannot be determined or the generated data is malformed for the given class
+	 * @throws InvocationTargetException When an underlying constructor for a provided Pojo Class throws an exception
+	 * @throws NoSuchMethodException     When a provided Pojo is missing their All Args Constructor
+	 * @throws IllegalAccessException    When a field being set is inaccessible
+	 * @throws ParseException            When the {@link FakerField#from()} or {@link FakerField#to()} are malformed
+	 * @throws ClassNotFoundException    When we resolve the type argument of a List, Map, or Set incorrectly
+	 */
+	Set<T> build() throws InstantiationException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException, ParseException, ClassNotFoundException;
 
 }

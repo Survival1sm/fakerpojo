@@ -7,6 +7,9 @@ import java.lang.annotation.Target;
 import java.time.temporal.ChronoUnit;
 import io.github.survival1sm.fakerpojo.domain.Type;
 
+/**
+ * Use this annotation to provide field level overrides for default value generation
+ */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FakerField {

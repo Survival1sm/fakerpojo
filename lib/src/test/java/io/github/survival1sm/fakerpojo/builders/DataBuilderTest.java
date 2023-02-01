@@ -1,17 +1,18 @@
 package io.github.survival1sm.fakerpojo.builders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import io.github.survival1sm.fakerpojo.FakerPojo;
-import io.github.survival1sm.fakerpojo.annotations.FakerField;
+import io.github.survival1sm.fakerpojo.domain.*;
 import io.github.survival1sm.fakerpojo.enums.NanoPrefix;
 import io.github.survival1sm.fakerpojo.exceptions.FieldGeneratorNotImplementedException;
 import io.github.survival1sm.fakerpojo.exceptions.NoAllArgsConstructorException;
 import io.github.survival1sm.fakerpojo.exceptions.UniqueValueException;
 import io.github.survival1sm.fakerpojo.service.NanoIdService;
-import io.leangen.geantyref.TypeFactory;
+import io.github.survival1sm.fakerpojo.service.TestValueGenerators;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,26 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import io.github.survival1sm.fakerpojo.domain.ClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.CustomValueGeneratorTestDomain;
-import io.github.survival1sm.fakerpojo.domain.FieldAnnotationTestDomain;
-import io.github.survival1sm.fakerpojo.domain.ListClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.ListDomainTestDomain;
-import io.github.survival1sm.fakerpojo.domain.ListMapTestDomain;
-import io.github.survival1sm.fakerpojo.domain.ListRecordTestDomain;
-import io.github.survival1sm.fakerpojo.domain.MapStringDomainTestDomain;
-import io.github.survival1sm.fakerpojo.domain.MapStringListTestDomain;
-import io.github.survival1sm.fakerpojo.domain.MapStringSetTestDomain;
-import io.github.survival1sm.fakerpojo.domain.NoAllArgsConstructorTestDomain;
-import io.github.survival1sm.fakerpojo.domain.RecordTestDomain;
-import io.github.survival1sm.fakerpojo.domain.SetClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.TestTypes;
-import io.github.survival1sm.fakerpojo.domain.UninimplementedFieldAnnotationTestDomain;
-import io.github.survival1sm.fakerpojo.service.TestValueGenerators;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DataBuilderTest {
 
@@ -92,15 +74,15 @@ class DataBuilderTest {
         .getFirst()
         .build();
 
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
-    assertTrue(test.getTestInteger() >= fieldAnnotation.min() && test.getTestInteger() <= fieldAnnotation.max());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
+    assertTrue(test.getTestInteger() >= fieldAnnotation.getMin() && test.getTestInteger() <= fieldAnnotation.getMax());
     assertTrue(Stream.of(true, false).anyMatch(bool -> bool.equals(test.getTestBoolean())));
     assertEquals(10, test.getTestString().length());
     assertTrue(test.getTestDate().getHours() == 0 && test.getTestDate().getMinutes() == 0
-               && test.getTestDate().getSeconds() == 0);
+        && test.getTestDate().getSeconds() == 0);
     assertEquals(10, test.getTestLocalDate().toString().length());
     assertTrue(test.getTestLocalDateTime().getHour() > 0 || test.getTestLocalDateTime().getMinute() > 0
-               || test.getTestLocalDateTime().getSecond() > 0);
+        || test.getTestLocalDateTime().getSecond() > 0);
     assertEquals(7, test.getTestLong().toString().length());
   }
 
@@ -110,22 +92,22 @@ class DataBuilderTest {
         .fromPojo(ListClassTestDomain.class)
         .getFirst()
         .build();
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
 
-    assertTrue(test.getTestInteger().size() == fieldAnnotation.records() && test.getTestInteger().get(0) != null);
-    assertTrue(test.getTestBoolean().size() == fieldAnnotation.records() && test.getTestBoolean().get(0) != null);
-    assertTrue(test.getTestDouble().size() == fieldAnnotation.records() && test.getTestDouble().get(0) != null);
-    assertTrue(test.getTestString().size() == fieldAnnotation.records() && test.getTestString().get(0) != null);
-    assertTrue(test.getTestDate().size() == fieldAnnotation.records() && test.getTestDate().get(0) != null);
-    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.records() && test.getTestLocalDate().get(0) != null);
+    assertTrue(test.getTestInteger().size() == fieldAnnotation.getRecords() && test.getTestInteger().get(0) != null);
+    assertTrue(test.getTestBoolean().size() == fieldAnnotation.getRecords() && test.getTestBoolean().get(0) != null);
+    assertTrue(test.getTestDouble().size() == fieldAnnotation.getRecords() && test.getTestDouble().get(0) != null);
+    assertTrue(test.getTestString().size() == fieldAnnotation.getRecords() && test.getTestString().get(0) != null);
+    assertTrue(test.getTestDate().size() == fieldAnnotation.getRecords() && test.getTestDate().get(0) != null);
+    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.getRecords() && test.getTestLocalDate().get(0) != null);
     assertTrue(
-        test.getTestLocalDateTime().size() == fieldAnnotation.records() && test.getTestLocalDateTime().get(0) != null);
-    assertTrue(test.getTestFloat().size() == fieldAnnotation.records() && test.getTestFloat().get(0) != null);
-    assertTrue(test.getTestLong().size() == fieldAnnotation.records() && test.getTestLong().get(0) != null);
-    assertTrue(test.getTestInstant().size() == fieldAnnotation.records() && test.getTestInstant().get(0) != null);
-    assertTrue(test.getTestEnum().size() == fieldAnnotation.records() && test.getTestEnum().get(0) != null);
-    assertTrue(test.getTestUuid().size() == fieldAnnotation.records() && test.getTestUuid().get(0) != null);
-    assertTrue(test.getTestDuration().size() == fieldAnnotation.records() && test.getTestDuration().get(0) != null);
+        test.getTestLocalDateTime().size() == fieldAnnotation.getRecords() && test.getTestLocalDateTime().get(0) != null);
+    assertTrue(test.getTestFloat().size() == fieldAnnotation.getRecords() && test.getTestFloat().get(0) != null);
+    assertTrue(test.getTestLong().size() == fieldAnnotation.getRecords() && test.getTestLong().get(0) != null);
+    assertTrue(test.getTestInstant().size() == fieldAnnotation.getRecords() && test.getTestInstant().get(0) != null);
+    assertTrue(test.getTestEnum().size() == fieldAnnotation.getRecords() && test.getTestEnum().get(0) != null);
+    assertTrue(test.getTestUuid().size() == fieldAnnotation.getRecords() && test.getTestUuid().get(0) != null);
+    assertTrue(test.getTestDuration().size() == fieldAnnotation.getRecords() && test.getTestDuration().get(0) != null);
   }
 
   @Test
@@ -134,31 +116,31 @@ class DataBuilderTest {
         .fromPojo(SetClassTestDomain.class)
         .getFirst()
         .build();
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
 
     assertTrue(
-        test.getTestInteger().size() == fieldAnnotation.records() && test.getTestInteger().iterator().next() != null);
+        test.getTestInteger().size() == fieldAnnotation.getRecords() && test.getTestInteger().iterator().next() != null);
     assertTrue(
-        test.getTestBoolean().size() == fieldAnnotation.records() && test.getTestBoolean().iterator().next() != null);
+        test.getTestBoolean().size() == fieldAnnotation.getRecords() && test.getTestBoolean().iterator().next() != null);
     assertTrue(
-        test.getTestDouble().size() == fieldAnnotation.records() && test.getTestDouble().iterator().next() != null);
+        test.getTestDouble().size() == fieldAnnotation.getRecords() && test.getTestDouble().iterator().next() != null);
     assertTrue(
-        test.getTestString().size() == fieldAnnotation.records() && test.getTestString().iterator().next() != null);
-    assertTrue(test.getTestDate().size() == fieldAnnotation.records() && test.getTestDate().iterator().next() != null);
-    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.records()
-               && test.getTestLocalDate().iterator().next() != null);
+        test.getTestString().size() == fieldAnnotation.getRecords() && test.getTestString().iterator().next() != null);
+    assertTrue(test.getTestDate().size() == fieldAnnotation.getRecords() && test.getTestDate().iterator().next() != null);
+    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.getRecords()
+        && test.getTestLocalDate().iterator().next() != null);
     assertTrue(
-        test.getTestLocalDateTime().size() == fieldAnnotation.records()
-        && test.getTestLocalDateTime().iterator().next() != null);
+        test.getTestLocalDateTime().size() == fieldAnnotation.getRecords()
+            && test.getTestLocalDateTime().iterator().next() != null);
     assertTrue(
-        test.getTestFloat().size() == fieldAnnotation.records() && test.getTestFloat().iterator().next() != null);
-    assertTrue(test.getTestLong().size() == fieldAnnotation.records() && test.getTestLong().iterator().next() != null);
+        test.getTestFloat().size() == fieldAnnotation.getRecords() && test.getTestFloat().iterator().next() != null);
+    assertTrue(test.getTestLong().size() == fieldAnnotation.getRecords() && test.getTestLong().iterator().next() != null);
     assertTrue(
-        test.getTestInstant().size() == fieldAnnotation.records() && test.getTestInstant().iterator().next() != null);
-    assertTrue(test.getTestEnum().size() == fieldAnnotation.records() && test.getTestEnum().iterator().next() != null);
-    assertTrue(test.getTestUuid().size() == fieldAnnotation.records() && test.getTestUuid().iterator().next() != null);
+        test.getTestInstant().size() == fieldAnnotation.getRecords() && test.getTestInstant().iterator().next() != null);
+    assertTrue(test.getTestEnum().size() == fieldAnnotation.getRecords() && test.getTestEnum().iterator().next() != null);
+    assertTrue(test.getTestUuid().size() == fieldAnnotation.getRecords() && test.getTestUuid().iterator().next() != null);
     assertTrue(
-        test.getTestDuration().size() == fieldAnnotation.records() && test.getTestDuration().iterator().next() != null);
+        test.getTestDuration().size() == fieldAnnotation.getRecords() && test.getTestDuration().iterator().next() != null);
   }
 
   @Test
@@ -167,35 +149,35 @@ class DataBuilderTest {
         .fromPojo(MapStringSetTestDomain.class)
         .getFirst()
         .build();
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
 
-    assertTrue(test.getTestInteger().size() == fieldAnnotation.records()
-               && test.getTestInteger().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestBoolean().size() == fieldAnnotation.records()
-               && test.getTestBoolean().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestDouble().size() == fieldAnnotation.records()
-               && test.getTestDouble().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestString().size() == fieldAnnotation.records()
-               && test.getTestString().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestDate().size() == fieldAnnotation.records()
-               && test.getTestDate().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.records()
-               && test.getTestLocalDate().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestInteger().size() == fieldAnnotation.getRecords()
+        && test.getTestInteger().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestBoolean().size() == fieldAnnotation.getRecords()
+        && test.getTestBoolean().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestDouble().size() == fieldAnnotation.getRecords()
+        && test.getTestDouble().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestString().size() == fieldAnnotation.getRecords()
+        && test.getTestString().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestDate().size() == fieldAnnotation.getRecords()
+        && test.getTestDate().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.getRecords()
+        && test.getTestLocalDate().values().iterator().next().iterator().next() != null);
     assertTrue(
-        test.getTestLocalDateTime().size() == fieldAnnotation.records()
-        && test.getTestLocalDateTime().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestFloat().size() == fieldAnnotation.records()
-               && test.getTestFloat().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestLong().size() == fieldAnnotation.records()
-               && test.getTestLong().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestInstant().size() == fieldAnnotation.records()
-               && test.getTestInstant().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestEnum().size() == fieldAnnotation.records()
-               && test.getTestEnum().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestUuid().size() == fieldAnnotation.records()
-               && test.getTestUuid().values().iterator().next().iterator().next() != null);
-    assertTrue(test.getTestDuration().size() == fieldAnnotation.records()
-               && test.getTestDuration().values().iterator().next().iterator().next() != null);
+        test.getTestLocalDateTime().size() == fieldAnnotation.getRecords()
+            && test.getTestLocalDateTime().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestFloat().size() == fieldAnnotation.getRecords()
+        && test.getTestFloat().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestLong().size() == fieldAnnotation.getRecords()
+        && test.getTestLong().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestInstant().size() == fieldAnnotation.getRecords()
+        && test.getTestInstant().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestEnum().size() == fieldAnnotation.getRecords()
+        && test.getTestEnum().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestUuid().size() == fieldAnnotation.getRecords()
+        && test.getTestUuid().values().iterator().next().iterator().next() != null);
+    assertTrue(test.getTestDuration().size() == fieldAnnotation.getRecords()
+        && test.getTestDuration().values().iterator().next().iterator().next() != null);
   }
 
   @Test
@@ -204,35 +186,35 @@ class DataBuilderTest {
         .fromPojo(MapStringListTestDomain.class)
         .getFirst()
         .build();
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
 
-    assertTrue(test.getTestInteger().size() == fieldAnnotation.records()
-               && test.getTestInteger().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestBoolean().size() == fieldAnnotation.records()
-               && test.getTestBoolean().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestDouble().size() == fieldAnnotation.records()
-               && test.getTestDouble().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestString().size() == fieldAnnotation.records()
-               && test.getTestString().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestDate().size() == fieldAnnotation.records()
-               && test.getTestDate().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.records()
-               && test.getTestLocalDate().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestInteger().size() == fieldAnnotation.getRecords()
+        && test.getTestInteger().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestBoolean().size() == fieldAnnotation.getRecords()
+        && test.getTestBoolean().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestDouble().size() == fieldAnnotation.getRecords()
+        && test.getTestDouble().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestString().size() == fieldAnnotation.getRecords()
+        && test.getTestString().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestDate().size() == fieldAnnotation.getRecords()
+        && test.getTestDate().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestLocalDate().size() == fieldAnnotation.getRecords()
+        && test.getTestLocalDate().values().iterator().next().get(0) != null);
     assertTrue(
-        test.getTestLocalDateTime().size() == fieldAnnotation.records()
-        && test.getTestLocalDateTime().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestFloat().size() == fieldAnnotation.records()
-               && test.getTestFloat().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestLong().size() == fieldAnnotation.records()
-               && test.getTestLong().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestInstant().size() == fieldAnnotation.records()
-               && test.getTestInstant().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestEnum().size() == fieldAnnotation.records()
-               && test.getTestEnum().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestUuid().size() == fieldAnnotation.records()
-               && test.getTestUuid().values().iterator().next().get(0) != null);
-    assertTrue(test.getTestDuration().size() == fieldAnnotation.records()
-               && test.getTestDuration().values().iterator().next().get(0) != null);
+        test.getTestLocalDateTime().size() == fieldAnnotation.getRecords()
+            && test.getTestLocalDateTime().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestFloat().size() == fieldAnnotation.getRecords()
+        && test.getTestFloat().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestLong().size() == fieldAnnotation.getRecords()
+        && test.getTestLong().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestInstant().size() == fieldAnnotation.getRecords()
+        && test.getTestInstant().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestEnum().size() == fieldAnnotation.getRecords()
+        && test.getTestEnum().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestUuid().size() == fieldAnnotation.getRecords()
+        && test.getTestUuid().values().iterator().next().get(0) != null);
+    assertTrue(test.getTestDuration().size() == fieldAnnotation.getRecords()
+        && test.getTestDuration().values().iterator().next().get(0) != null);
   }
 
   @Test
@@ -241,10 +223,10 @@ class DataBuilderTest {
         .fromPojo(MapStringDomainTestDomain.class)
         .getFirst()
         .build();
-    FakerField fieldAnnotation = TypeFactory.annotation(FakerField.class, Map.of());
+    DefaultFakerFieldProps fieldAnnotation = new DefaultFakerFieldProps();
 
-    assertTrue(test.getTestDomainMap().size() == fieldAnnotation.records()
-               && test.getTestDomainMap().values().iterator().next() != null);
+    assertTrue(test.getTestDomainMap().size() == fieldAnnotation.getRecords()
+        && test.getTestDomainMap().values().iterator().next() != null);
   }
 
   @Test
