@@ -359,4 +359,24 @@ class DataBuilderTest {
 		assertThrows(FieldGeneratorNotImplementedException.class, () ->
 				FakerPojo.Builder.fromPojo(UninimplementedFieldAnnotationTestDomain.class).getFirst().build());
 	}
+
+	@Test
+	void build_pojo_with_object_field_throws_FieldGeneratorNotImplementedException() {
+		assertThrows(FieldGeneratorNotImplementedException.class, () ->
+				FakerPojo.Builder.fromPojo(ObjectTestDomain.class).getFirst().build());
+	}
+
+	@Test
+	void build_pojo_with_object_field_and_provided_value_generator_returns_expected_value() throws Exception {
+
+		FakerPojo.addFieldValuesGenerator(Type.OBJECT, (FakerFieldProps fieldProps) -> "stringForObject");
+
+		ObjectTestDomain objectTestDomain = FakerPojo.Builder
+				.fromPojo(ObjectTestDomain.class)
+				.getFirst()
+				.build();
+
+
+		assertEquals(objectTestDomain.getTestObject(), "stringForObject");
+	}
 }

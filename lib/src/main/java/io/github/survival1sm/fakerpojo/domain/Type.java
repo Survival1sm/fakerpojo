@@ -33,6 +33,7 @@ public class Type {
 	public static final String DURATION = "DURATION";
 	public static final String CITY = "CITY";
 	public static final String STATE = "STATE";
+	public static final String OBJECT = "OBJECT";
 
 	public static final List<String> defaultTypeList = List.of(
 			FULL_NAME,
@@ -45,6 +46,7 @@ public class Type {
 			DATE,
 			LOCALDATE,
 			LOCALDATETIME,
+			OBJECT,
 			PARAGRAPH,
 			CLASS,
 			LIST,

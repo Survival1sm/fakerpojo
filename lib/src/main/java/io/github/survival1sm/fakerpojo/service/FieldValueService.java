@@ -1,6 +1,7 @@
 package io.github.survival1sm.fakerpojo.service;
 
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
+import io.github.survival1sm.fakerpojo.domain.Type;
 import io.github.survival1sm.fakerpojo.exceptions.FieldGeneratorNotImplementedException;
 import io.github.survival1sm.fakerpojo.generators.FieldValueGenerator;
 
@@ -25,7 +26,11 @@ public class FieldValueService {
 			return fieldValuesGeneratorMap.get(fieldProps.getType()).createFakeData(fieldProps);
 		}
 
+		if (Type.OBJECT.equals(fieldProps.getType())) {
+			throw new FieldGeneratorNotImplementedException("Please provide a default field value generator to handle generic Object fields!");
+		}
+
 		throw new FieldGeneratorNotImplementedException(
-				"A field generator for type %s has not been provided!".formatted(fieldProps.getType()));
+				"A field value generator for type %s has not been provided!".formatted(fieldProps.getType()));
 	}
 }
