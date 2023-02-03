@@ -377,6 +377,7 @@ class DataBuilderTest {
 				.build();
 
 
-		assertEquals(objectTestDomain.getTestObject(), "stringForObject");
+		assertEquals("stringForObject", objectTestDomain.getTestObject());
+		assertEquals("stringForObject", objectTestDomain.getTestObjectMap().values().iterator().next());
 	}
 }

@@ -91,6 +91,12 @@ public class Utilities {
 			}
 		}
 
+		String[] paramTypePackageArray = pt.getActualTypeArguments()[1].getTypeName().split("\\.");
+
+		if (Type.defaultTypeList.contains(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase())) {
+			return new ImmutablePair<>(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase(), pt.getActualTypeArguments()[1]);
+		}
+
 		return new ImmutablePair<>(Type.CLASS, pt.getActualTypeArguments()[1]);
 	}
 
