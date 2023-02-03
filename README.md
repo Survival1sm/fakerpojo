@@ -1,6 +1,7 @@
 # Faker Pojo
 [![Maven Status](https://maven-badges.herokuapp.com/maven-central/io.github.survival1sm/fakerpojo/badge.svg?style=flat)](http://mvnrepository.com/artifact/io.github.survival1sm/fakerpojo)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![codecov](https://codecov.io/github/Survival1sm/fakerpojo/branch/main/graph/badge.svg?token=ASX1GLNNNH)](https://codecov.io/github/Survival1sm/fakerpojo)
 
 This library uses [datafaker](https://github.com/datafaker-net/datafaker) to create Java Objects populated with
 fake data. 
