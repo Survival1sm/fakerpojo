@@ -65,10 +65,6 @@ public class SetClassTestDomain {
 		return testLong;
 	}
 
-//  public Set<ObjectId> getTestObjectId() {
-//    return testObjectId;
-//  }
-
 	public Set<Instant> getTestInstant() {
 		return testInstant;
 	}

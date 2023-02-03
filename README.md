@@ -1,7 +1,11 @@
 # Faker Pojo
+[![Maven Status](https://maven-badges.herokuapp.com/maven-central/io.github.survival1sm/fakerpojo/badge.svg?style=flat)](http://mvnrepository.com/artifact/io.github.survival1sm/fakerpojo)
+[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 This library uses [datafaker](https://github.com/datafaker-net/datafaker) to create Java Objects populated with
-fake data.
+fake data. 
+
+Inspired by the work of [aeonflash](https://github.com/aeonflash).
 
 This library has been developed for use in testing environments, though, some may find use for it elsewhere.
 
@@ -21,7 +25,7 @@ In the pom.xml, add the following fragment to the `dependencies` section:
 <dependency>
     <groupId>io.github.survival1sm</groupId>
     <artifactId>fakerpojo</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
@@ -29,7 +33,7 @@ For Gradle users, add the following to your build.gradle file.
 
 ```groovy
 dependencies {
-    implementation 'io.github.survival1sm:fakerpojo:0.0.2'
+    implementation 'io.github.survival1sm:fakerpojo:0.0.3'
 }
 
 ```
@@ -128,7 +132,7 @@ Register your new types:
 
 ```java
   @BeforeAll
-static void addTestValueGenerator(){
+static void addTestValueGenerator() {
   FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER,TestValueGenerators.employeeNumberValueGenerator);
   FakerPojo.addFieldValuesGenerator(TestTypes.EMPLOYEE_NUMBER_STRING,TestValueGenerators.employeeNumberStringValueGenerator);
   FakerPojo.addFieldValuesGenerator(TestTypes.TYPE_NANOID,TestValueGenerators.typeNanoIdValueGenerator);
