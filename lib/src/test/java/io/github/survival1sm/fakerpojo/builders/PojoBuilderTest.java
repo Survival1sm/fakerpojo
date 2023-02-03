@@ -139,4 +139,18 @@ public class PojoBuilderTest {
 		assertEquals(String.class, test.getExtendedFieldString().getClass());
 		assertEquals(SetClassTestDomain.class, test.getExtendedNestedField().getClass());
 	}
+
+	@Test
+	void build_with_extended_class_and_unique_key_creates_correct_data() throws Exception {
+		List<ExtendedClassTestDomain> test = FakerPojo.Builder
+				.fromPojo(ExtendedClassTestDomain.class)
+				.toList()
+				.withRecords(1)
+				.withUniqueOnKey("testString")
+				.build();
+
+		assertEquals(test.get(0).getExtendedFieldList().size(), 1);
+		assertEquals(String.class, test.get(0).getExtendedFieldString().getClass());
+		assertEquals(SetClassTestDomain.class, test.get(0).getExtendedNestedField().getClass());
+	}
 }

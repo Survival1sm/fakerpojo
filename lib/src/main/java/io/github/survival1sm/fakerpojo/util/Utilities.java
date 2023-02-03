@@ -49,10 +49,10 @@ public class Utilities {
 		}
 
 		try {
-			String[] paramTypePackageArray = baseClass.getTypeName().split("\\.");
+			String simpleClassName = baseClass.getSimpleName().toUpperCase();
 
-			if (Type.defaultTypeList.contains(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase())) {
-				return paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase();
+			if (Type.defaultTypeList.contains(simpleClassName)) {
+				return simpleClassName;
 			}
 		} catch (IllegalArgumentException ignored) {
 		}
@@ -107,11 +107,28 @@ public class Utilities {
 	 */
 	public static <T> Integer getHashForUniqueField(T fakeData, Class<T> baseClass, String uniqueOnKey) throws NoSuchFieldException, IllegalAccessException {
 
-		final Field fieldFromClass = fakeData.getClass().getDeclaredField(uniqueOnKey);
+		final Field fieldFromClass = Utilities.getFieldFromClassOrSuperclass(fakeData.getClass(), uniqueOnKey);
 		fieldFromClass.trySetAccessible();
 
-		return
-				"%s%s%s".formatted(baseClass.getName(), uniqueOnKey, fieldFromClass.get(fakeData)).hashCode();
+		return "%s%s%s".formatted(baseClass.getName(), uniqueOnKey, fieldFromClass.get(fakeData)).hashCode();
+	}
+
+	/**
+	 * Recursively travel a class and superclass to retrieve a field by name
+	 *
+	 * @param baseClass The starting class to travel
+	 * @return A List of {@link Field} for the class and all superclasses
+	 */
+	public static Field getFieldFromClassOrSuperclass(Class<?> baseClass, String fieldName) throws NoSuchFieldException {
+
+		do {
+			try {
+				return baseClass.getDeclaredField(fieldName);
+			} catch (Exception ignored) {
+			}
+		} while ((baseClass = baseClass.getSuperclass()) != null);
+
+		throw new NoSuchFieldException("Unable to find a field with name %s".formatted(fieldName));
 	}
 
 	/**

@@ -310,7 +310,7 @@ public class FakerPojo {
 					while (i < this.records) {
 						T fakeData = PojoDataService.createFakePojo(this.baseClass, this.overrides);
 
-						final Field fieldFromKey = fakeData.getClass().getDeclaredField(mapKey);
+						final Field fieldFromKey = Utilities.getFieldFromClassOrSuperclass(fakeData.getClass(), mapKey);
 						fieldFromKey.trySetAccessible();
 
 						if (uniqueOnKey != null) {
@@ -576,9 +576,6 @@ public class FakerPojo {
 					final T fakeData = PojoDataService.createFakePojo(this.baseClass, this.overrides);
 
 					if (uniqueOnKey != null) {
-						final Field fieldFromClass = fakeData.getClass().getDeclaredField(uniqueOnKey);
-						fieldFromClass.trySetAccessible();
-
 						final int hash = Utilities.getHashForUniqueField(fakeData, this.baseClass, uniqueOnKey);
 
 						if (!uniqueOnKeyList.contains(hash)) {
@@ -597,9 +594,6 @@ public class FakerPojo {
 					final T fakeData = PojoDataService.createFakePojo(this.baseClass, this.overrides);
 
 					if (uniqueOnKey != null) {
-						final Field fieldFromClass = fakeData.getClass().getDeclaredField(uniqueOnKey);
-						fieldFromClass.trySetAccessible();
-
 						final int hash = Utilities.getHashForUniqueField(fakeData, this.baseClass, uniqueOnKey);
 
 						if (!uniqueOnKeyList.contains(hash)) {
