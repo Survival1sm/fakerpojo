@@ -26,7 +26,7 @@ In the pom.xml, add the following fragment to the `dependencies` section:
 <dependency>
     <groupId>io.github.survival1sm</groupId>
     <artifactId>fakerpojo</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.3.1</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ For Gradle users, add the following to your build.gradle file.
 
 ```groovy
 dependencies {
-    implementation 'io.github.survival1sm:fakerpojo:0.0.3'
+    implementation 'io.github.survival1sm:fakerpojo:0.0.3.1'
 }
 
 ```
