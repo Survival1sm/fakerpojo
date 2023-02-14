@@ -1,10 +1,7 @@
 package io.github.survival1sm.fakerpojo.builders;
 
 import io.github.survival1sm.fakerpojo.FakerPojo;
-import io.github.survival1sm.fakerpojo.domain.ClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.ExtendedClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.SetClassTestDomain;
-import io.github.survival1sm.fakerpojo.domain.TestTypes;
+import io.github.survival1sm.fakerpojo.domain.*;
 import io.github.survival1sm.fakerpojo.enums.NanoPrefix;
 import io.github.survival1sm.fakerpojo.service.TestValueGenerators;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class PojoBuilderTest {
+class PojoBuilderTest {
 
 	@BeforeAll
 	static void addTestValueGenerator() {
@@ -135,7 +131,7 @@ public class PojoBuilderTest {
 				.getFirst()
 				.build();
 
-		assertEquals(test.getExtendedFieldList().size(), 1);
+		assertEquals(1, test.getExtendedFieldList().size());
 		assertEquals(String.class, test.getExtendedFieldString().getClass());
 		assertEquals(SetClassTestDomain.class, test.getExtendedNestedField().getClass());
 	}
@@ -149,8 +145,21 @@ public class PojoBuilderTest {
 				.withUniqueOnKey("testString")
 				.build();
 
-		assertEquals(test.get(0).getExtendedFieldList().size(), 1);
+		assertEquals(1, test.get(0).getExtendedFieldList().size());
 		assertEquals(String.class, test.get(0).getExtendedFieldString().getClass());
 		assertEquals(SetClassTestDomain.class, test.get(0).getExtendedNestedField().getClass());
+	}
+
+	@Test
+	void build_with_recursive_class_generates_data_to_expected_depth() throws Exception {
+		RecursiveTestDomain recursiveTestDomain = FakerPojo
+				.Builder
+				.fromPojo(RecursiveTestDomain.class)
+				.getFirst()
+				.build();
+
+		assertEquals(1, recursiveTestDomain.getRecursiveTestDomainList().size());
+		assertEquals(1, recursiveTestDomain.getRecursiveTestDomainList().get(0).getRecursiveTestDomainList().size());
+		assertNull(recursiveTestDomain.getRecursiveTestDomainList().get(0).getRecursiveTestDomainList().get(0).getRecursiveTestDomainList());
 	}
 }

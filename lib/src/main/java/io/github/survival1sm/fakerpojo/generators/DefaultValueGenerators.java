@@ -1,6 +1,7 @@
 package io.github.survival1sm.fakerpojo.generators;
 
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
+import io.github.survival1sm.fakerpojo.service.PojoDataService;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.text.SimpleDateFormat;
@@ -9,77 +10,79 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.UUID;
 
-import static io.github.survival1sm.fakerpojo.service.PojoDataService.faker;
-
 public class DefaultValueGenerators {
 
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-  
-	public static FieldValueGenerator stringGenerator = (FakerFieldProps fieldProps) -> faker.lorem()
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
+
+	private DefaultValueGenerators() {
+		throw new UnsupportedOperationException("Utility class should not be instantiated");
+	}
+
+	public static final FieldValueGenerator stringGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().lorem()
 			.fixedString(fieldProps.getLength());
 
-	public static FieldValueGenerator booleanGenerator = (FakerFieldProps fieldProps) -> faker.bool().bool();
+	public static final FieldValueGenerator booleanGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().bool().bool();
 
-	public static FieldValueGenerator dateGenerator = (FakerFieldProps fieldProps) ->
+	public static final FieldValueGenerator dateGenerator = (FakerFieldProps fieldProps) ->
 			DateUtils.truncate(
-					faker.date().between(dateFormat.parse(fieldProps.getFrom()), dateFormat.parse(fieldProps.getTo())),
+					PojoDataService.getFaker().date().between(new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getFrom()), new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getTo())),
 					Calendar.DATE);
 
-	public static FieldValueGenerator localDateGenerator = (FakerFieldProps fieldProps) -> faker
+	public static final FieldValueGenerator localDateGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker()
 			.date()
-			.between(dateFormat.parse(fieldProps.getFrom()), dateFormat.parse(fieldProps.getTo()))
+			.between(new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getFrom()), new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getTo()))
 			.toInstant()
 			.atZone(ZoneId.systemDefault())
 			.toLocalDate();
 
-	public static FieldValueGenerator localDateTimeGenerator = (FakerFieldProps fieldProps) -> faker
+	public static final FieldValueGenerator localDateTimeGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker()
 			.date()
-			.between(dateFormat.parse(fieldProps.getFrom()), dateFormat.parse(fieldProps.getTo()))
+			.between(new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getFrom()), new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getTo()))
 			.toInstant()
 			.atZone(ZoneId.systemDefault())
 			.toLocalDateTime();
 
-	public static FieldValueGenerator instantGenerator = (FakerFieldProps fieldProps) -> faker
+	public static final FieldValueGenerator instantGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker()
 			.date()
-			.between(dateFormat.parse(fieldProps.getFrom()), dateFormat.parse(fieldProps.getTo()))
+			.between(new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getFrom()), new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getTo()))
 			.toInstant();
 
-	public static FieldValueGenerator durationGenerator = (FakerFieldProps fieldProps) -> Duration.of(
+	public static final FieldValueGenerator durationGenerator = (FakerFieldProps fieldProps) -> Duration.of(
 			fieldProps.getLength(), fieldProps.getChronoUnit());
 
-	public static FieldValueGenerator paragraphGenerator = (FakerFieldProps fieldProps) -> String.join(
-			System.lineSeparator(), faker.lorem().paragraphs(fieldProps.getLength()));
+	public static final FieldValueGenerator paragraphGenerator = (FakerFieldProps fieldProps) -> String.join(
+			System.lineSeparator(), PojoDataService.getFaker().lorem().paragraphs(fieldProps.getLength()));
 
-	public static FieldValueGenerator fullNameGenerator =
-			(FakerFieldProps fieldProps) -> "%s %s".formatted(faker.name().firstName(), faker.name().lastName());
+	public static final FieldValueGenerator fullNameGenerator =
+			(FakerFieldProps fieldProps) -> "%s %s".formatted(PojoDataService.getFaker().name().firstName(), PojoDataService.getFaker().name().lastName());
 
-	public static FieldValueGenerator lastNameGenerator = (FakerFieldProps fieldProps) -> faker.name().lastName();
+	public static final FieldValueGenerator lastNameGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().name().lastName();
 
-	public static FieldValueGenerator firstNameGenerator = (FakerFieldProps fieldProps) -> faker.name().firstName();
+	public static final FieldValueGenerator firstNameGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().name().firstName();
 
-	public static FieldValueGenerator urlGenerator = (FakerFieldProps fieldProps) -> faker.internet().url();
+	public static final FieldValueGenerator urlGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().internet().url();
 
-	public static FieldValueGenerator phoneNumberGenerator = (FakerFieldProps fieldProps) -> faker.phoneNumber()
+	public static final FieldValueGenerator phoneNumberGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().phoneNumber()
 			.cellPhone();
 
-	public static FieldValueGenerator emailGenerator = (FakerFieldProps fieldProps) -> faker.internet().emailAddress();
+	public static final FieldValueGenerator emailGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().internet().emailAddress();
 
-	public static FieldValueGenerator uuidGenerator = (FakerFieldProps fieldProps) -> UUID.randomUUID();
+	public static final FieldValueGenerator uuidGenerator = (FakerFieldProps fieldProps) -> UUID.randomUUID();
 
-	public static FieldValueGenerator doubleGenerator = (FakerFieldProps fieldProps) -> faker.number()
+	public static final FieldValueGenerator doubleGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().number()
 			.randomDouble(fieldProps.getDecimals(), fieldProps.getMin(), fieldProps.getMax());
 
-	public static FieldValueGenerator floatGenerator = (FakerFieldProps fieldProps) -> (float) faker.number()
+	public static final FieldValueGenerator floatGenerator = (FakerFieldProps fieldProps) -> (float) PojoDataService.getFaker().number()
 			.randomDouble(fieldProps.getDecimals(), fieldProps.getMin(),
 					fieldProps.getMax());
 
-	public static FieldValueGenerator longGenerator = (FakerFieldProps fieldProps) -> faker.number()
+	public static final FieldValueGenerator longGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().number()
 			.randomNumber(7, true);
 
-	public static FieldValueGenerator integerGenerator = (FakerFieldProps fieldProps) -> faker.number()
+	public static final FieldValueGenerator integerGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().number()
 			.numberBetween(fieldProps.getMin(), fieldProps.getMax());
 
-	public static FieldValueGenerator cityGenerator = (FakerFieldProps fieldProps) -> faker.address().city();
+	public static final FieldValueGenerator cityGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().address().city();
 
-	public static FieldValueGenerator stateGenerator = (FakerFieldProps fieldProps) -> faker.address().state();
+	public static final FieldValueGenerator stateGenerator = (FakerFieldProps fieldProps) -> PojoDataService.getFaker().address().state();
 }

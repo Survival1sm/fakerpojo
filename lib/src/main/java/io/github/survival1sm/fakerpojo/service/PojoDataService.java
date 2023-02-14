@@ -8,7 +8,6 @@ import io.github.survival1sm.fakerpojo.util.Utilities;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -19,9 +18,26 @@ import static io.github.survival1sm.fakerpojo.domain.Type.*;
 
 public class PojoDataService {
 
-	public static DefaultFakerFieldProps defaultFakerFieldProps = new DefaultFakerFieldProps();
+	private PojoDataService() {
+		throw new UnsupportedOperationException("Data service should not be instantiated");
+	}
 
-	public static Faker faker = new Faker();
+	private static final LinkedHashMap<Integer, Integer> recursiveFieldList = new LinkedHashMap<>();
+	private static DefaultFakerFieldProps defaultFakerFieldProps = new DefaultFakerFieldProps();
+
+	public static DefaultFakerFieldProps getDefaultFakerFieldProps() {
+		return PojoDataService.defaultFakerFieldProps;
+	}
+
+	public static void setDefaultFakerFieldProps(DefaultFakerFieldProps defaultFakerFieldProps) {
+		PojoDataService.defaultFakerFieldProps = defaultFakerFieldProps;
+	}
+
+	private static Faker faker = new Faker();
+
+	public static Faker getFaker() {
+		return PojoDataService.faker;
+	}
 
 	/**
 	 * Used internally to set the {@link Locale}
@@ -50,6 +66,7 @@ public class PojoDataService {
 	public static <T> T createFakePojo(Class<T> baseClass, Map<String, Object> overrides) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, ParseException, ClassNotFoundException {
 		final List<Field> allFields = Utilities.getAllFieldsFromClassAndSuperclass(baseClass);
 		final List<Class<?>> fieldClassList = new ArrayList<>();
+		Utilities.identifyRecursiveFields(allFields, baseClass, recursiveFieldList);
 		final Map<Field, Object> fieldDataList = new LinkedHashMap<>();
 
 		for (Field field : allFields) {
@@ -63,6 +80,14 @@ public class PojoDataService {
 
 			if (overrides.containsKey(field.getName())) {
 				fieldDataList.put(field, overrides.get(field.getName()));
+			} else if (recursiveFieldList.containsKey(field.hashCode())) {
+				if (recursiveFieldList.get(field.hashCode()) >= defaultFakerFieldProps.getMaxDepth()) {
+					fieldDataList.put(field, null);
+				} else {
+					recursiveFieldList.put(field.hashCode(), recursiveFieldList.get(field.hashCode()) + 1);
+
+					fieldDataList.put(field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
+				}
 			} else {
 				fieldDataList.put(field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
 			}
@@ -70,8 +95,6 @@ public class PojoDataService {
 
 		if (baseClass.isRecord()) {
 			baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()])).trySetAccessible();
-
-			Constructor constructor = baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()]));
 
 			return baseClass.getDeclaredConstructor(fieldClassList.toArray(new Class[allFields.size()]))
 					.newInstance(fieldDataList.values().toArray());
@@ -103,7 +126,7 @@ public class PojoDataService {
 	 * @throws ParseException            When the {@link FakerField#from()} or {@link FakerField#to()} are malformed
 	 * @throws ClassNotFoundException    When we resolve the type argument of a List, Map, or Set incorrectly
 	 */
-	public static <T> Object createFakeField(FakerFieldProps fieldProps, Class<T> baseClass, Field field) throws NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException, ParseException, ClassNotFoundException {
+	public static <T, E extends Enum<E>> Object createFakeField(FakerFieldProps fieldProps, Class<T> baseClass, Field field) throws NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException, ParseException, ClassNotFoundException {
 		switch (fieldProps.getType()) {
 			case CLASS:
 				return Builder
@@ -118,11 +141,11 @@ public class PojoDataService {
 				return PojoDataService.createFakeMap(fieldProps, field);
 			case ENUM:
 				if (field != null) {
-					final List<Enum<?>> enumValues = new ArrayList<>(EnumSet.allOf((Class<Enum>) field.getType()));
+					final List<Enum<?>> enumValues = new ArrayList<>(EnumSet.allOf((Class<E>) field.getType()));
 
 					return enumValues.get(faker.number().numberBetween(0, enumValues.size()));
 				}
-				final List<Enum<?>> enumValues = new ArrayList<>(EnumSet.allOf((Class<Enum>) baseClass));
+				final List<Enum<?>> enumValues = new ArrayList<>(EnumSet.allOf((Class<E>) baseClass));
 
 				return enumValues.get(faker.number().numberBetween(0, enumValues.size()));
 			default:
@@ -130,72 +153,35 @@ public class PojoDataService {
 		}
 	}
 
-	/**
-	 * Create a List of fake data for the provided {@link Field}
-	 *
-	 * @param fieldProps The {@link FakerField} props or the {@link DefaultFakerFieldProps}
-	 * @param subClass   The class of data holding the list
-	 * @param field      The {@link Field} for which we need to generate a fake list
-	 * @param <T>        The class of data holding the list
-	 * @return A list of objects for the field
-	 * @throws NoSuchFieldException      When a field cannot be retrieved from a Pojo Class
-	 * @throws InstantiationException    When a {@link io.github.survival1sm.fakerpojo.domain.Type} cannot be determined or the generated data is malformed for the given class
-	 * @throws InvocationTargetException When an underlying constructor for a provided Pojo Class throws an exception
-	 * @throws NoSuchMethodException     When a provided Pojo is missing their All Args Constructor
-	 * @throws IllegalAccessException    When a field being set is inaccessible
-	 * @throws ParseException            When the {@link FakerField#from()} or {@link FakerField#to()} are malformed
-	 * @throws ClassNotFoundException    When we resolve the type argument of a List, Map, or Set incorrectly
-	 */
 	private static <T> Object createFakeList(FakerFieldProps fieldProps, Class<T> subClass, Field field) throws ClassNotFoundException, ParseException, NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException {
-		if (field.getGenericType() instanceof ParameterizedType nestedType) {
-			if (nestedType.getActualTypeArguments()[0] instanceof ParameterizedType nestedMap) {
-				if (nestedMap.getRawType().equals(Map.class)) {
-					List<Object> mapList = new ArrayList<>();
 
-					int i = 0;
-					while (i < fieldProps.getRecords()) {
-						mapList.add(PojoDataService.createFakeMap(fieldProps, field));
-						i++;
-					}
-					return mapList;
-				}
-			}
-			if (!nestedType.getRawType().equals(List.class)) {
-				if (nestedType.getActualTypeArguments().length > 1
-						&& nestedType.getActualTypeArguments()[1] instanceof ParameterizedType nestedGeneric) {
-					String fakerType =
-							Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
-									Utilities.determineFakerValueTypeFromClass(
-											Class.forName(nestedGeneric.getActualTypeArguments()[0].getTypeName())));
-					if (fakerType != null) {
-						return Builder
-								.fromClass(Class.forName(nestedGeneric.getActualTypeArguments()[0].getTypeName()))
-								.toList()
-								.withRecords(fieldProps.getRecords())
-								.build();
-					}
-				}
-			}
-			String fakerType =
-					Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
-							Utilities.determineFakerValueTypeFromClass(
-									Class.forName(nestedType.getActualTypeArguments()[0].getTypeName())));
-			if (fakerType != null) {
-				return Builder
-						.fromClass(Class.forName(nestedType.getActualTypeArguments()[0].getTypeName()))
-						.toList()
-						.withRecords(fieldProps.getRecords())
-						.build();
-			}
+		ParameterizedType nestedType = (ParameterizedType) field.getGenericType();
+		Class<?> parameterizedTypeClassValue = Utilities.getClassFromParameterizedType(nestedType);
 
+		if (nestedType.getActualTypeArguments()[0] instanceof ParameterizedType nestedMap && nestedMap.getRawType().equals(Map.class)) {
+			List<Object> mapList = new ArrayList<>();
+
+			int i = 0;
+			while (i < fieldProps.getRecords()) {
+				mapList.add(PojoDataService.createFakeMap(fieldProps, field));
+				i++;
+			}
+			return mapList;
+		}
+
+		String fakerType = Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
+				Utilities.determineFakerValueTypeFromClass(parameterizedTypeClassValue));
+
+		if (fakerType != null) {
 			return Builder
-					.fromPojo(Class.forName(nestedType.getActualTypeArguments()[0].getTypeName()))
+					.fromClass(parameterizedTypeClassValue)
 					.toList()
 					.withRecords(fieldProps.getRecords())
 					.build();
 		}
+
 		return Builder
-				.fromClass(subClass)
+				.fromPojo(parameterizedTypeClassValue)
 				.toList()
 				.withRecords(fieldProps.getRecords())
 				.build();
@@ -218,55 +204,33 @@ public class PojoDataService {
 	 * @throws ClassNotFoundException    When we resolve the type argument of a List, Map, or Set incorrectly
 	 */
 	private static <T> Object createFakeSet(FakerFieldProps fieldProps, Class<T> subClass, Field field) throws ClassNotFoundException, ParseException, NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException {
-		if (field.getGenericType() instanceof ParameterizedType nestedType) {
-			if (nestedType.getActualTypeArguments()[0] instanceof ParameterizedType nestedMap) {
-				if (nestedMap.getRawType().equals(Map.class)) {
-					Set<Object> mapList = new HashSet<>();
+		ParameterizedType nestedType = (ParameterizedType) field.getGenericType();
+		Class<?> parameterizedTypeClassValue = Utilities.getClassFromParameterizedType(nestedType);
 
-					int i = 0;
-					while (i < fieldProps.getRecords()) {
-						mapList.add(PojoDataService.createFakeMap(fieldProps, field));
-						i++;
-					}
-					return mapList;
-				}
-			}
-			if (!nestedType.getRawType().equals(Set.class)) {
-				if (nestedType.getActualTypeArguments().length > 1
-						&& nestedType.getActualTypeArguments()[1] instanceof ParameterizedType nestedGeneric) {
-					String fakerType =
-							Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
-									Utilities.determineFakerValueTypeFromClass(
-											Class.forName(nestedGeneric.getActualTypeArguments()[0].getTypeName())));
-					if (fakerType != null) {
-						return Builder
-								.fromClass(Class.forName(nestedGeneric.getActualTypeArguments()[0].getTypeName()))
-								.toSet()
-								.withRecords(fieldProps.getRecords())
-								.build();
-					}
-				}
-			}
-			String fakerType =
-					Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
-							Utilities.determineFakerValueTypeFromClass(
-									Class.forName(nestedType.getActualTypeArguments()[0].getTypeName())));
-			if (fakerType != null) {
-				return Builder
-						.fromClass(Class.forName(nestedType.getActualTypeArguments()[0].getTypeName()))
-						.toSet()
-						.withRecords(fieldProps.getRecords())
-						.build();
-			}
+		if (nestedType.getActualTypeArguments()[0] instanceof ParameterizedType nestedMap && nestedMap.getRawType().equals(Map.class)) {
+			Set<Object> mapList = new HashSet<>();
 
+			int i = 0;
+			while (i < fieldProps.getRecords()) {
+				mapList.add(PojoDataService.createFakeMap(fieldProps, field));
+				i++;
+			}
+			return mapList;
+		}
+
+		String fakerType =
+				Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(subClass)).orElse(
+						Utilities.determineFakerValueTypeFromClass(parameterizedTypeClassValue));
+		if (fakerType != null) {
 			return Builder
-					.fromPojo(Class.forName(nestedType.getActualTypeArguments()[0].getTypeName()))
+					.fromClass(parameterizedTypeClassValue)
 					.toSet()
 					.withRecords(fieldProps.getRecords())
 					.build();
 		}
+
 		return Builder
-				.fromClass(subClass)
+				.fromPojo(parameterizedTypeClassValue)
 				.toSet()
 				.withRecords(fieldProps.getRecords())
 				.build();
@@ -290,7 +254,7 @@ public class PojoDataService {
 		final Map<Object, Object> newMap = new HashMap<>();
 
 		List<Object> keyList = new ArrayList<>();
-		FakerFieldProps keyFieldProps = PojoDataService.defaultFakerFieldProps.withType(STRING);
+		FakerFieldProps keyFieldProps = PojoDataService.getDefaultFakerFieldProps().withType(STRING);
 
 		int i = 0;
 		while (i < fieldProps.getRecords()) {
@@ -304,7 +268,7 @@ public class PojoDataService {
 
 		Pair<String, java.lang.reflect.Type> fakerValueType = Utilities.determineFakerValueTypeFromField(field);
 
-		FakerFieldProps valueFieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerValueType.getKey());
+		FakerFieldProps valueFieldProps = PojoDataService.getDefaultFakerFieldProps().withType(fakerValueType.getKey());
 
 		i = 0;
 		while (i < fieldProps.getRecords()) {

@@ -18,21 +18,27 @@ import java.util.*;
 
 public class FakerPojo {
 
+	private FakerPojo() {
+		throw new UnsupportedOperationException("FakerPojo should not be instantiated");
+	}
+
 	public static void resetDefaultFakerFieldProps() {
-		PojoDataService.defaultFakerFieldProps = new DefaultFakerFieldProps();
+		PojoDataService.setDefaultFakerFieldProps(new DefaultFakerFieldProps());
 	}
 
 	public static void setDefaultFakerFieldProps(FakerFieldProps fakerFieldProps) {
 
-		PojoDataService.defaultFakerFieldProps.setLength(fakerFieldProps.getLength());
-		PojoDataService.defaultFakerFieldProps.setDecimals(fakerFieldProps.getDecimals());
-		PojoDataService.defaultFakerFieldProps.setMin(fakerFieldProps.getMin());
-		PojoDataService.defaultFakerFieldProps.setMax(fakerFieldProps.getMax());
-		PojoDataService.defaultFakerFieldProps.setRecords(fakerFieldProps.getRecords());
-		PojoDataService.defaultFakerFieldProps.setFrom(fakerFieldProps.getFrom());
-		PojoDataService.defaultFakerFieldProps.setTo(fakerFieldProps.getTo());
-		PojoDataService.defaultFakerFieldProps.setChronoUnit(fakerFieldProps.getChronoUnit());
+		PojoDataService.getDefaultFakerFieldProps().setLength(fakerFieldProps.getLength());
+		PojoDataService.getDefaultFakerFieldProps().setDecimals(fakerFieldProps.getDecimals());
+		PojoDataService.getDefaultFakerFieldProps().setMin(fakerFieldProps.getMin());
+		PojoDataService.getDefaultFakerFieldProps().setMax(fakerFieldProps.getMax());
+		PojoDataService.getDefaultFakerFieldProps().setRecords(fakerFieldProps.getRecords());
+		PojoDataService.getDefaultFakerFieldProps().setFrom(fakerFieldProps.getFrom());
+		PojoDataService.getDefaultFakerFieldProps().setTo(fakerFieldProps.getTo());
+		PojoDataService.getDefaultFakerFieldProps().setChronoUnit(fakerFieldProps.getChronoUnit());
 	}
+
+	private static final String UNIQUE_VALUE_EXCEPTION_TEMPLATE = "Unable to generate unique value for key %s after %s attempts";
 
 	/**
 	 * Set the {@link Locale} for the underlying {@link net.datafaker.Faker}
@@ -61,7 +67,7 @@ public class FakerPojo {
 
 		private static List<Integer> uniqueOnKeyList = new ArrayList<>();
 
-		public Builder() {
+		private Builder() {
 			FieldValueService.fieldValuesGeneratorMap.put(Type.STRING, DefaultValueGenerators.stringGenerator);
 			FieldValueService.fieldValuesGeneratorMap.put(Type.BOOLEAN, DefaultValueGenerators.booleanGenerator);
 			FieldValueService.fieldValuesGeneratorMap.put(Type.DATE, DefaultValueGenerators.dateGenerator);
@@ -132,7 +138,7 @@ public class FakerPojo {
 				@Override
 				public T build() throws NoSuchFieldException, InvocationTargetException, InstantiationException, NoSuchMethodException, IllegalAccessException, ParseException, ClassNotFoundException {
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.getDefaultFakerFieldProps().withType(fakerType);
 
 					return (T) PojoDataService.createFakeField(fieldProps, this.baseClass, null);
 				}
@@ -169,7 +175,7 @@ public class FakerPojo {
 					List<T> outputList = new ArrayList<>();
 
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.getDefaultFakerFieldProps().withType(fakerType);
 
 					int i = 0;
 					while (i < this.records) {
@@ -214,7 +220,7 @@ public class FakerPojo {
 					Set<T> outputList = new HashSet<>();
 
 					String fakerType = Utilities.determineFakerValueTypeFromClass(this.baseClass);
-					FakerFieldProps fieldProps = PojoDataService.defaultFakerFieldProps.withType(fakerType);
+					FakerFieldProps fieldProps = PojoDataService.getDefaultFakerFieldProps().withType(fakerType);
 
 					int i = 0;
 					while (i < this.records) {
@@ -325,7 +331,7 @@ public class FakerPojo {
 								attempt++;
 								if (attempt > 199) {
 									throw new UniqueValueException(
-											"Unable to generate unique value for key %s after %s attempts".formatted(uniqueOnKey, attempt));
+											UNIQUE_VALUE_EXCEPTION_TEMPLATE.formatted(uniqueOnKey, attempt));
 								}
 							}
 						} else {
@@ -398,7 +404,7 @@ public class FakerPojo {
 								attempt++;
 								if (attempt > 199) {
 									throw new UniqueValueException(
-											"Unable to generate unique value for key %s after %s attempts".formatted(uniqueOnKey, attempt));
+											UNIQUE_VALUE_EXCEPTION_TEMPLATE.formatted(uniqueOnKey, attempt));
 								}
 							}
 						} else {
@@ -462,7 +468,7 @@ public class FakerPojo {
 								attempt++;
 								if (attempt > 199) {
 									throw new UniqueValueException(
-											"Unable to generate unique value for key %s after %s attempts".formatted(uniqueOnKey, attempt));
+											UNIQUE_VALUE_EXCEPTION_TEMPLATE.formatted(uniqueOnKey, attempt));
 								}
 							}
 						} else {
@@ -537,7 +543,7 @@ public class FakerPojo {
 								attempt++;
 								if (attempt > 199) {
 									throw new UniqueValueException(
-											"Unable to generate unique value for key %s after %s attempts".formatted(uniqueOnKey, attempt));
+											UNIQUE_VALUE_EXCEPTION_TEMPLATE.formatted(uniqueOnKey, attempt));
 								}
 							}
 						} else {
@@ -603,7 +609,7 @@ public class FakerPojo {
 						} else {
 							if (attempt > 199) {
 								throw new UniqueValueException(
-										"Unable to generate unique value for key %s after %s attempts".formatted(uniqueOnKey, attempt));
+										UNIQUE_VALUE_EXCEPTION_TEMPLATE.formatted(uniqueOnKey, attempt));
 							}
 							attempt++;
 							return this.build(attempt);

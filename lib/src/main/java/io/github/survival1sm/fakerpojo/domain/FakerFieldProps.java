@@ -4,86 +4,95 @@ import java.time.temporal.ChronoUnit;
 
 public class FakerFieldProps {
 
-  private String type;
-  private int length;
-  private int decimals;
-  private int min;
-  private int max;
-  private int records;
-  private String from;
-  private String to;
-  private ChronoUnit chronoUnit;
+	private String type;
+	private int length;
+	private int decimals;
+	private int min;
+	private int max;
+	private int records;
+	private int maxDepth;
+	private String from;
+	private String to;
+	private ChronoUnit chronoUnit;
 
-  public ChronoUnit getChronoUnit() {
-    return chronoUnit;
-  }
+	public int getMaxDepth() {
+		return maxDepth;
+	}
 
-  public void setChronoUnit(ChronoUnit chronoUnit) {
-    this.chronoUnit = chronoUnit;
-  }
+	public void setMaxDepth(int maxDepth) {
+		this.maxDepth = maxDepth;
+	}
 
-  public String getType() {
-    return type;
-  }
+	public ChronoUnit getChronoUnit() {
+		return chronoUnit;
+	}
 
-  public void setType(String type) {
-    this.type = type;
-  }
+	public void setChronoUnit(ChronoUnit chronoUnit) {
+		this.chronoUnit = chronoUnit;
+	}
 
-  public int getLength() {
-    return length;
-  }
+	public String getType() {
+		return type;
+	}
 
-  public void setLength(int length) {
-    this.length = length;
-  }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-  public int getDecimals() {
-    return decimals;
-  }
+	public int getLength() {
+		return length;
+	}
 
-  public void setDecimals(int decimals) {
-    this.decimals = decimals;
-  }
+	public void setLength(int length) {
+		this.length = length;
+	}
 
-  public int getMin() {
-    return min;
-  }
+	public int getDecimals() {
+		return decimals;
+	}
 
-  public void setMin(int min) {
-    this.min = min;
-  }
+	public void setDecimals(int decimals) {
+		this.decimals = decimals;
+	}
 
-  public int getMax() {
-    return max;
-  }
+	public int getMin() {
+		return min;
+	}
 
-  public void setMax(int max) {
-    this.max = max;
-  }
+	public void setMin(int min) {
+		this.min = min;
+	}
 
-  public int getRecords() {
-    return records;
-  }
+	public int getMax() {
+		return max;
+	}
 
-  public void setRecords(int records) {
-    this.records = records;
-  }
+	public void setMax(int max) {
+		this.max = max;
+	}
 
-  public String getFrom() {
-    return from;
-  }
+	public int getRecords() {
+		return records;
+	}
 
-  public void setFrom(String from) {
-    this.from = from;
-  }
+	public void setRecords(int records) {
+		this.records = records;
+	}
 
-  public String getTo() {
-    return to;
-  }
+	public String getFrom() {
+		return from;
+	}
 
-  public void setTo(String to) {
-    this.to = to;
-  }
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
 
 }

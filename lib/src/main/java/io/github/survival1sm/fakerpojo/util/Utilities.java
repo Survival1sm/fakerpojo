@@ -14,6 +14,40 @@ import java.util.*;
 
 public class Utilities {
 
+	private Utilities() {
+		throw new UnsupportedOperationException("Utility class should not be instantiated");
+	}
+
+	public static Class<?> getClassFromParameterizedType(ParameterizedType parameterizedType) throws ClassNotFoundException {
+		Class<?> parameterizedClass = parameterizedType.getClass();
+
+		for (java.lang.reflect.Type type : parameterizedType.getActualTypeArguments()) {
+			if (type instanceof ParameterizedType nestedType) {
+				parameterizedClass = Utilities.getClassFromParameterizedType(nestedType);
+			} else {
+
+				parameterizedClass = Class.forName(type.getTypeName());
+			}
+		}
+
+		return parameterizedClass;
+	}
+
+	public static <T> void identifyRecursiveFields(List<Field> allFields, Class<T> baseClass, Map<Integer, Integer> recursiveFieldList) throws ClassNotFoundException {
+		for (Field field : allFields) {
+			if (field.getType().isAssignableFrom(baseClass)) {
+				recursiveFieldList.putIfAbsent(field.hashCode(), 0);
+			}
+			if (field.getGenericType() instanceof ParameterizedType nestedType) {
+				Class<?> parameterizedClass = Utilities.getClassFromParameterizedType(nestedType);
+
+				if (parameterizedClass.isAssignableFrom(baseClass)) {
+					recursiveFieldList.putIfAbsent(field.hashCode(), 0);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Convert a {@link FakerField} into {@link FakerFieldProps}
 	 *
@@ -29,6 +63,7 @@ public class Utilities {
 		fakerFieldProps.setMin(fakerFieldAnnotation.min());
 		fakerFieldProps.setMax(fakerFieldAnnotation.max());
 		fakerFieldProps.setRecords(fakerFieldAnnotation.records());
+		fakerFieldProps.setMaxDepth(fakerFieldAnnotation.maxDepth());
 		fakerFieldProps.setFrom(fakerFieldAnnotation.from());
 		fakerFieldProps.setTo(fakerFieldAnnotation.to());
 		fakerFieldProps.setChronoUnit(fakerFieldAnnotation.chronoUnit());
@@ -55,6 +90,7 @@ public class Utilities {
 				return simpleClassName;
 			}
 		} catch (IllegalArgumentException ignored) {
+			// ignore the exception
 		}
 
 		return null;
@@ -78,16 +114,14 @@ public class Utilities {
 						nestedType.getRawType());
 			}
 		}
-		if (pt.getActualTypeArguments()[0] instanceof ParameterizedType nestedType) {
-			if (nestedType.getRawType().equals(Map.class)) {
-				String[] paramTypePackageArray = nestedType.getActualTypeArguments()[1].getTypeName().split("\\.");
+		if (pt.getActualTypeArguments()[0] instanceof ParameterizedType nestedType && nestedType.getRawType().equals(Map.class)) {
+			String[] paramTypePackageArray = nestedType.getActualTypeArguments()[1].getTypeName().split("\\.");
 
-				if (Type.defaultTypeList.contains(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase())) {
-					return new ImmutablePair<>(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase(),
-							nestedType.getActualTypeArguments()[1]);
-				} else {
-					return new ImmutablePair<>(Type.CLASS, nestedType.getActualTypeArguments()[1]);
-				}
+			if (Type.defaultTypeList.contains(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase())) {
+				return new ImmutablePair<>(paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase(),
+						nestedType.getActualTypeArguments()[1]);
+			} else {
+				return new ImmutablePair<>(Type.CLASS, nestedType.getActualTypeArguments()[1]);
 			}
 		}
 
@@ -131,6 +165,7 @@ public class Utilities {
 			try {
 				return baseClass.getDeclaredField(fieldName);
 			} catch (Exception ignored) {
+				// ignore the exception
 			}
 		} while ((baseClass = baseClass.getSuperclass()) != null);
 
@@ -150,6 +185,7 @@ public class Utilities {
 			try {
 				allFields.addAll(Arrays.asList(baseClass.getDeclaredFields()));
 			} catch (Exception ignored) {
+				// ignore the exception
 			}
 		} while ((baseClass = baseClass.getSuperclass()) != null);
 
@@ -169,14 +205,14 @@ public class Utilities {
 	public static <T> ImmutablePair<Class<?>, FakerFieldProps> generateDefaultFieldProps(Class<T> baseClass, Field field) throws ClassNotFoundException, InstantiationException {
 		if (field.getGenericType() instanceof ParameterizedType parameterizedType) {
 			if (parameterizedType.getActualTypeArguments().length > 1) {
-				return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(Type.MAP));
+				return new ImmutablePair<>(baseClass, PojoDataService.getDefaultFakerFieldProps().withType(Type.MAP));
 			}
 
 			if (parameterizedType.getActualTypeArguments().length == 1) {
 				String[] paramTypePackageArray = parameterizedType.getRawType().getTypeName().split("\\.");
 
 				String type = paramTypePackageArray[paramTypePackageArray.length - 1].toUpperCase();
-				return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(type));
+				return new ImmutablePair<>(baseClass, PojoDataService.getDefaultFakerFieldProps().withType(type));
 			}
 			String fakerType =
 					Optional.ofNullable(Utilities.determineFakerValueTypeFromClass(baseClass))
@@ -189,16 +225,16 @@ public class Utilities {
 						field.getName()));
 			}
 
-			return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(fakerType));
+			return new ImmutablePair<>(baseClass, PojoDataService.getDefaultFakerFieldProps().withType(fakerType));
 		}
 		if (field.getType().isEnum()) {
-			return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(Type.ENUM));
+			return new ImmutablePair<>(baseClass, PojoDataService.getDefaultFakerFieldProps().withType(Type.ENUM));
 		}
 		String fakerType = Utilities.determineFakerValueTypeFromClass(field.getType());
 		if (fakerType == null) {
-			return new ImmutablePair<>(field.getType(), PojoDataService.defaultFakerFieldProps.withType(Type.CLASS));
+			return new ImmutablePair<>(field.getType(), PojoDataService.getDefaultFakerFieldProps().withType(Type.CLASS));
 		}
 
-		return new ImmutablePair<>(baseClass, PojoDataService.defaultFakerFieldProps.withType(fakerType));
+		return new ImmutablePair<>(baseClass, PojoDataService.getDefaultFakerFieldProps().withType(fakerType));
 	}
 }
