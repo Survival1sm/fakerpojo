@@ -14,6 +14,8 @@ public class DefaultFakerFieldProps extends FakerFieldProps {
 	private int max = 1000000;
 	private int records = 1;
 	private int maxDepth = 2;
+
+	private String defaultValueExpression = null;
 	private String from = "2000-01-01 00:00:00";
 	private String to = "2100-01-01 00:00:00";
 	private ChronoUnit chronoUnit = ChronoUnit.MINUTES;
@@ -21,6 +23,16 @@ public class DefaultFakerFieldProps extends FakerFieldProps {
 	public DefaultFakerFieldProps withType(String type) {
 		this.type = type;
 		return this;
+	}
+
+	@Override
+	public String getDefaultValueExpression() {
+		return defaultValueExpression;
+	}
+
+	@Override
+	public void setDefaultValueExpression(String defaultValueExpression) {
+		this.defaultValueExpression = defaultValueExpression;
 	}
 
 	@Override

@@ -64,6 +64,7 @@ public class Utilities {
 		fakerFieldProps.setMax(fakerFieldAnnotation.max());
 		fakerFieldProps.setRecords(fakerFieldAnnotation.records());
 		fakerFieldProps.setMaxDepth(fakerFieldAnnotation.maxDepth());
+		fakerFieldProps.setDefaultValueExpression(fakerFieldAnnotation.defaultValueExpression());
 		fakerFieldProps.setFrom(fakerFieldAnnotation.from());
 		fakerFieldProps.setTo(fakerFieldAnnotation.to());
 		fakerFieldProps.setChronoUnit(fakerFieldAnnotation.chronoUnit());

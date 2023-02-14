@@ -11,9 +11,18 @@ public class FakerFieldProps {
 	private int max;
 	private int records;
 	private int maxDepth;
+	private String defaultValueExpression;
 	private String from;
 	private String to;
 	private ChronoUnit chronoUnit;
+
+	public String getDefaultValueExpression() {
+		return defaultValueExpression;
+	}
+
+	public void setDefaultValueExpression(String defaultValueExpression) {
+		this.defaultValueExpression = defaultValueExpression;
+	}
 
 	public int getMaxDepth() {
 		return maxDepth;

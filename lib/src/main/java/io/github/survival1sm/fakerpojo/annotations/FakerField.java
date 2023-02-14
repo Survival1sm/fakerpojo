@@ -29,6 +29,8 @@ public @interface FakerField {
 
 	int maxDepth() default 2;
 
+	String defaultValueExpression() default "";
+
 	String from() default "2000-01-01 00:00:00";
 
 	String to() default "2100-01-01 00:00:00";

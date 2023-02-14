@@ -162,4 +162,17 @@ class PojoBuilderTest {
 		assertEquals(1, recursiveTestDomain.getRecursiveTestDomainList().get(0).getRecursiveTestDomainList().size());
 		assertNull(recursiveTestDomain.getRecursiveTestDomainList().get(0).getRecursiveTestDomainList().get(0).getRecursiveTestDomainList());
 	}
+
+	@Test
+	void build_with_expression_generates_expected_expression_data() throws Exception {
+		Instant start = Instant.now();
+		ExpressionTestDomain expressionTestDomain = FakerPojo.Builder
+				.fromPojo(ExpressionTestDomain.class)
+				.getFirst()
+				.build();
+
+		assertTrue(expressionTestDomain.getTestBoolean());
+		assertTrue(expressionTestDomain.getTestInstant().isAfter(start));
+		assertEquals(NanoPrefix.project, expressionTestDomain.getTestEnum());
+	}
 }

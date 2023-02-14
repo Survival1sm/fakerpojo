@@ -6,7 +6,10 @@ import io.github.survival1sm.fakerpojo.domain.DefaultFakerFieldProps;
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
 import io.github.survival1sm.fakerpojo.util.Utilities;
 import net.datafaker.Faker;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +25,7 @@ public class PojoDataService {
 		throw new UnsupportedOperationException("Data service should not be instantiated");
 	}
 
+	private static final ExpressionParser expressionParser = new SpelExpressionParser();
 	private static final LinkedHashMap<Integer, Integer> recursiveFieldList = new LinkedHashMap<>();
 	private static DefaultFakerFieldProps defaultFakerFieldProps = new DefaultFakerFieldProps();
 
@@ -80,6 +84,8 @@ public class PojoDataService {
 
 			if (overrides.containsKey(field.getName())) {
 				fieldDataList.put(field, overrides.get(field.getName()));
+			} else if (StringUtils.isNotEmpty(fieldProps.getValue().getDefaultValueExpression())) {
+				fieldDataList.put(field, expressionParser.parseExpression(fieldProps.getValue().getDefaultValueExpression()).getValue(field.getType()));
 			} else if (recursiveFieldList.containsKey(field.hashCode())) {
 				if (recursiveFieldList.get(field.hashCode()) >= defaultFakerFieldProps.getMaxDepth()) {
 					fieldDataList.put(field, null);
