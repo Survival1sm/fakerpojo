@@ -4,12 +4,11 @@ import java.util.List;
 
 public class ListRecordTestDomain {
 
-	private List<RecordTestDomain> recordTestDomainList;
+  private List<RecordTestDomain> recordTestDomainList;
 
-	public ListRecordTestDomain() {
-	}
+  public ListRecordTestDomain() {}
 
-	public List<RecordTestDomain> getRecordTestDomainList() {
-		return recordTestDomainList;
-	}
+  public List<RecordTestDomain> getRecordTestDomainList() {
+    return recordTestDomainList;
+  }
 }

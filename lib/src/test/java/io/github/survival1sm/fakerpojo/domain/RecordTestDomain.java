@@ -1,5 +1,6 @@
 package io.github.survival1sm.fakerpojo.domain;
 
+import io.github.survival1sm.fakerpojo.enums.NanoPrefix;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -7,10 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-import io.github.survival1sm.fakerpojo.enums.NanoPrefix;
-
 public record RecordTestDomain(
-
     Integer testInteger,
     Boolean testBoolean,
     Double testDouble,
@@ -23,7 +21,4 @@ public record RecordTestDomain(
     Instant testInstant,
     NanoPrefix testEnum,
     UUID testUuid,
-    Duration testDuration
-) {
-
-}
+    Duration testDuration) {}

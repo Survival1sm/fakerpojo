@@ -4,23 +4,21 @@ import java.util.List;
 
 public class ExtendedClassTestDomain extends ClassTestDomain {
 
-	public ExtendedClassTestDomain() {
+  private List<Integer> extendedFieldList;
+  private String extendedFieldString;
+  private SetClassTestDomain extendedNestedField;
 
-	}
+  public ExtendedClassTestDomain() {}
 
-	private List<Integer> extendedFieldList;
-	private String extendedFieldString;
-	private SetClassTestDomain extendedNestedField;
+  public List<Integer> getExtendedFieldList() {
+    return extendedFieldList;
+  }
 
-	public List<Integer> getExtendedFieldList() {
-		return extendedFieldList;
-	}
+  public String getExtendedFieldString() {
+    return extendedFieldString;
+  }
 
-	public String getExtendedFieldString() {
-		return extendedFieldString;
-	}
-
-	public SetClassTestDomain getExtendedNestedField() {
-		return extendedNestedField;
-	}
+  public SetClassTestDomain getExtendedNestedField() {
+    return extendedNestedField;
+  }
 }

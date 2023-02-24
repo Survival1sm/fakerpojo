@@ -4,14 +4,14 @@ import java.util.Map;
 
 public class ObjectTestDomain {
 
-	private Object testObject;
-	private Map<String, Object> testObjectMap;
+  private Object testObject;
+  private Map<String, Object> testObjectMap;
 
-	public Object getTestObject() {
-		return testObject;
-	}
+  public Object getTestObject() {
+    return testObject;
+  }
 
-	public Map<String, Object> getTestObjectMap() {
-		return testObjectMap;
-	}
+  public Map<String, Object> getTestObjectMap() {
+    return testObjectMap;
+  }
 }

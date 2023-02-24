@@ -4,15 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.github.survival1sm.fakerpojo.FakerPojo;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.github.survival1sm.fakerpojo.FakerPojo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ClassBuilderTest {
+class ClassBuilderTest {
 
   @BeforeEach
   void setUp() {
@@ -44,14 +43,15 @@ public class ClassBuilderTest {
 
   @Test
   void build_first_integer_with_override_throws_UnsupportedOperationException() {
-    assertThrows(UnsupportedOperationException.class,
-        () -> FakerPojo.Builder.fromClass(Integer.class).getFirst().withOverrides(Map.of()).build());
+    DataBuilder<Integer> test =
+        FakerPojo.Builder.fromClass(Integer.class).getFirst().withOverrides(Map.of());
+    assertThrows(UnsupportedOperationException.class, test::build);
   }
 
   @Test
   void build_first_integer_with_unique_throws_UnsupportedOperationException() {
-    assertThrows(UnsupportedOperationException.class,
-        () -> FakerPojo.Builder.fromClass(Integer.class).getFirst().withUniqueOnKey("").build());
+    DataBuilder<Integer> test =
+        FakerPojo.Builder.fromClass(Integer.class).getFirst().withUniqueOnKey("");
+    assertThrows(UnsupportedOperationException.class, test::build);
   }
-
 }

@@ -12,6 +12,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
+    id "com.diffplug.spotless" version "6.15.0"
 }
 
 group = "io.github.survival1sm"
@@ -79,11 +80,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-expression:6.0.4'
+    implementation 'org.springframework:spring-expression:5.3.0'
+    implementation 'net.datafaker:datafaker:1.7.0'
     testImplementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    implementation 'org.apache.commons:commons-lang3:3.0'
-    implementation 'net.datafaker:datafaker:1.7.0'
 }
 
 tasks.named('test') {
@@ -95,6 +95,13 @@ jacocoTestReport {
     reports {
         xml.enabled true
         html.enabled false
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        formatAnnotations()
     }
 }
 

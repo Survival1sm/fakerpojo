@@ -1,50 +1,42 @@
 package io.github.survival1sm.fakerpojo.builders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.github.survival1sm.fakerpojo.FakerPojo;
 import io.github.survival1sm.fakerpojo.domain.DefaultFakerFieldProps;
 import io.github.survival1sm.fakerpojo.domain.ListClassTestDomain;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 
-import java.time.temporal.ChronoUnit;
+class ModifierTest {
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+  @Test
+  void build_set_default_props_uses_new_props() throws Exception {
 
-public class ModifierTest {
+    ListClassTestDomain originalTestList =
+        FakerPojo.Builder.fromPojo(ListClassTestDomain.class).getFirst().build();
 
-	@Test
-	void build_set_default_props_uses_new_props() throws Exception {
+    assertEquals(1, originalTestList.getTestString().size());
+    assertEquals(600, originalTestList.getTestDuration().get(0).getSeconds());
+    DefaultFakerFieldProps fakerFieldProps = new DefaultFakerFieldProps();
 
-		ListClassTestDomain originalTestList = FakerPojo.Builder
-				.fromPojo(ListClassTestDomain.class)
-				.getFirst()
-				.build();
+    fakerFieldProps.setRecords(10);
+    fakerFieldProps.setChronoUnit(ChronoUnit.HOURS);
 
-		assertEquals(1, originalTestList.getTestString().size());
-		assertEquals(600, originalTestList.getTestDuration().get(0).getSeconds());
-		DefaultFakerFieldProps fakerFieldProps = new DefaultFakerFieldProps();
+    FakerPojo.setDefaultFakerFieldProps(fakerFieldProps);
 
-		fakerFieldProps.setRecords(10);
-		fakerFieldProps.setChronoUnit(ChronoUnit.HOURS);
+    ListClassTestDomain updatedTestList =
+        FakerPojo.Builder.fromPojo(ListClassTestDomain.class).getFirst().build();
 
-		FakerPojo.setDefaultFakerFieldProps(fakerFieldProps);
+    assertEquals(10, updatedTestList.getTestString().size());
+    assertEquals(36000, updatedTestList.getTestDuration().get(0).getSeconds());
 
-		ListClassTestDomain updatedTestList = FakerPojo.Builder
-				.fromPojo(ListClassTestDomain.class)
-				.getFirst()
-				.build();
+    FakerPojo.resetDefaultFakerFieldProps();
 
-		assertEquals(10, updatedTestList.getTestString().size());
-		assertEquals(36000, updatedTestList.getTestDuration().get(0).getSeconds());
+    ListClassTestDomain originalTestListTwo =
+        FakerPojo.Builder.fromPojo(ListClassTestDomain.class).getFirst().build();
 
-		FakerPojo.resetDefaultFakerFieldProps();
-
-
-		ListClassTestDomain originalTestListTwo = FakerPojo.Builder
-				.fromPojo(ListClassTestDomain.class)
-				.getFirst()
-				.build();
-
-		assertEquals(1, originalTestListTwo.getTestString().size());
-		assertEquals(600, originalTestListTwo.getTestDuration().get(0).getSeconds());
-	}
+    assertEquals(1, originalTestListTwo.getTestString().size());
+    assertEquals(600, originalTestListTwo.getTestDuration().get(0).getSeconds());
+  }
 }

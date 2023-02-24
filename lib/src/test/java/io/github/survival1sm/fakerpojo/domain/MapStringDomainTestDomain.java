@@ -4,13 +4,11 @@ import java.util.Map;
 
 public class MapStringDomainTestDomain {
 
-	private Map<String, ClassTestDomain> testDomainMap;
+  private Map<String, ClassTestDomain> testDomainMap;
 
-	public MapStringDomainTestDomain() {
-	}
+  public MapStringDomainTestDomain() {}
 
-	public Map<String, ClassTestDomain> getTestDomainMap() {
-		return testDomainMap;
-	}
-
+  public Map<String, ClassTestDomain> getTestDomainMap() {
+    return testDomainMap;
+  }
 }

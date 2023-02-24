@@ -1,12 +1,10 @@
 package io.github.survival1sm.fakerpojo.service;
 
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
 import io.github.survival1sm.fakerpojo.enums.NanoPrefix;
 import io.github.survival1sm.fakerpojo.generators.FieldValueGenerator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.datafaker.Faker;
 
 public class TestValueGenerators {
