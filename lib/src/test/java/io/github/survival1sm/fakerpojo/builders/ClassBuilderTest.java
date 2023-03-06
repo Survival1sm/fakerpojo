@@ -43,15 +43,14 @@ class ClassBuilderTest {
 
   @Test
   void build_first_integer_with_override_throws_UnsupportedOperationException() {
-    DataBuilder<Integer> test =
-        FakerPojo.Builder.fromClass(Integer.class).getFirst().withOverrides(Map.of());
-    assertThrows(UnsupportedOperationException.class, test::build);
+    DataBuilder<Integer> test = FakerPojo.Builder.fromClass(Integer.class).getFirst();
+    Map<String, Object> testMap = Map.of();
+    assertThrows(UnsupportedOperationException.class, () -> test.withOverrides(testMap));
   }
 
   @Test
   void build_first_integer_with_unique_throws_UnsupportedOperationException() {
-    DataBuilder<Integer> test =
-        FakerPojo.Builder.fromClass(Integer.class).getFirst().withUniqueOnKey("");
-    assertThrows(UnsupportedOperationException.class, test::build);
+    DataBuilder<Integer> test = FakerPojo.Builder.fromClass(Integer.class).getFirst();
+    assertThrows(UnsupportedOperationException.class, () -> test.withUniqueOnKey(""));
   }
 }

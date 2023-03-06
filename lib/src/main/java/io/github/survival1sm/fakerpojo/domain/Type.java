@@ -8,11 +8,8 @@ import java.util.List;
  * The list of default types used to resolve into Java types for generation using {@link
  * ClassBuilder } and custom types for {@link FieldValueGenerator}.
  */
+@SuppressWarnings("java:S1118")
 public class Type {
-
-  private Type() {
-    throw new UnsupportedOperationException("Type should not be instantiated");
-  }
 
   public static final String FULL_NAME = "FULL_NAME";
   public static final String LAST_NAME = "LAST_NAME";
