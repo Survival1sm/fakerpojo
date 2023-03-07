@@ -201,12 +201,14 @@ A complete list of default types:
 * City
 * State
 * Integer
+* int
 * Boolean
 * Double
 * String
 * Date
 * Local Date
 * Local Datetime
+* Offset Datetime
 * Float
 * Long
 * Instant

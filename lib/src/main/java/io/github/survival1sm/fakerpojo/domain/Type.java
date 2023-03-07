@@ -15,12 +15,14 @@ public class Type {
   public static final String LAST_NAME = "LAST_NAME";
   public static final String FIRST_NAME = "FIRST_NAME";
   public static final String INTEGER = "INTEGER";
+  public static final String INT = "INT";
   public static final String BOOLEAN = "BOOLEAN";
   public static final String DOUBLE = "DOUBLE";
   public static final String STRING = "STRING";
   public static final String DATE = "DATE";
   public static final String LOCALDATE = "LOCALDATE";
   public static final String LOCALDATETIME = "LOCALDATETIME";
+  public static final String OFFSETDATETIME = "OFFSETDATETIME";
   public static final String PARAGRAPH = "PARAGRAPH";
   public static final String CLASS = "CLASS";
   public static final String LIST = "LIST";
@@ -45,12 +47,14 @@ public class Type {
           LAST_NAME,
           FIRST_NAME,
           INTEGER,
+          INT,
           BOOLEAN,
           DOUBLE,
           STRING,
           DATE,
           LOCALDATE,
           LOCALDATETIME,
+          OFFSETDATETIME,
           OBJECT,
           PARAGRAPH,
           CLASS,

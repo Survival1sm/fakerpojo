@@ -102,6 +102,8 @@ public class FakerPojo {
       FieldValueService.getFieldValuesGeneratorMap()
           .put(Type.LOCALDATETIME, DefaultValueGenerators.localDateTimeGenerator);
       FieldValueService.getFieldValuesGeneratorMap()
+          .put(Type.OFFSETDATETIME, DefaultValueGenerators.offsetDateTimeValueGenerator);
+      FieldValueService.getFieldValuesGeneratorMap()
           .put(Type.INSTANT, DefaultValueGenerators.instantGenerator);
       FieldValueService.getFieldValuesGeneratorMap()
           .put(Type.DURATION, DefaultValueGenerators.durationGenerator);
@@ -129,6 +131,8 @@ public class FakerPojo {
           .put(Type.LONG, DefaultValueGenerators.longGenerator);
       FieldValueService.getFieldValuesGeneratorMap()
           .put(Type.INTEGER, DefaultValueGenerators.integerGenerator);
+      FieldValueService.getFieldValuesGeneratorMap()
+          .put(Type.INT, DefaultValueGenerators.integerGenerator);
       FieldValueService.getFieldValuesGeneratorMap()
           .put(Type.CITY, DefaultValueGenerators.cityGenerator);
       FieldValueService.getFieldValuesGeneratorMap()

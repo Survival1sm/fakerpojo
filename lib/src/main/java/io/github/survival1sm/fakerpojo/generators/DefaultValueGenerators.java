@@ -96,6 +96,18 @@ public class DefaultValueGenerators {
               .toInstant()
               .atZone(ZoneId.systemDefault())
               .toLocalDateTime();
+
+  public static final FieldValueGenerator offsetDateTimeValueGenerator =
+      (FakerFieldProps fieldProps) ->
+          PojoDataService.getFaker()
+              .date()
+              .between(
+                  new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getFrom()),
+                  new SimpleDateFormat(DATE_FORMAT).parse(fieldProps.getTo()))
+              .toInstant()
+              .atZone(ZoneId.systemDefault())
+              .toOffsetDateTime();
+
   public static final FieldValueGenerator instantGenerator =
       (FakerFieldProps fieldProps) ->
           PojoDataService.getFaker()
