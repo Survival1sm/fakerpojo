@@ -37,12 +37,17 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 public class PojoDataService {
 
   private static final ExpressionParser expressionParser = new SpelExpressionParser();
-  private static final LinkedHashMap<Integer, Integer> recursiveFieldList = new LinkedHashMap<>();
   private static DefaultFakerFieldProps defaultFakerFieldProps = new DefaultFakerFieldProps();
   private static Faker faker = new Faker();
 
   private PojoDataService() {
     throw new UnsupportedOperationException("Data service should not be instantiated");
+  }
+
+  private static final Map<Integer, Integer> recursiveFieldMap = new LinkedHashMap<>();
+
+  public static Map<Integer, Integer> getRecursiveFieldMap() {
+    return PojoDataService.recursiveFieldMap;
   }
 
   public static DefaultFakerFieldProps getDefaultFakerFieldProps() {
@@ -91,7 +96,7 @@ public class PojoDataService {
           IllegalAccessException, NoSuchFieldException, ParseException, ClassNotFoundException {
     final List<Field> allFields = Utilities.getAllFieldsFromClassAndSuperclass(baseClass);
     final List<Class<?>> fieldClassList = new ArrayList<>();
-    Utilities.identifyRecursiveFields(allFields, baseClass, recursiveFieldList);
+    Utilities.identifyRecursiveFields(allFields, baseClass, recursiveFieldMap);
     final Map<Field, Object> fieldDataList = new LinkedHashMap<>();
 
     for (Field field : allFields) {
@@ -113,11 +118,11 @@ public class PojoDataService {
             expressionParser
                 .parseExpression(fieldProps.getValue().getDefaultValueExpression())
                 .getValue(field.getType()));
-      } else if (recursiveFieldList.containsKey(field.hashCode())) {
-        if (recursiveFieldList.get(field.hashCode()) >= defaultFakerFieldProps.getMaxDepth()) {
+      } else if (recursiveFieldMap.containsKey(field.hashCode())) {
+        if (recursiveFieldMap.get(field.hashCode()) >= defaultFakerFieldProps.getMaxDepth()) {
           fieldDataList.put(field, null);
         } else {
-          recursiveFieldList.put(field.hashCode(), recursiveFieldList.get(field.hashCode()) + 1);
+          recursiveFieldMap.put(field.hashCode(), recursiveFieldMap.get(field.hashCode()) + 1);
 
           fieldDataList.put(
               field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));

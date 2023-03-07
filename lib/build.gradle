@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "io.github.survival1sm"
-version = "0.0.4"
+version = "0.0.4.1"
 archivesBaseName = "fakerpojo"
 
 java {

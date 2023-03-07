@@ -210,6 +210,8 @@ public class FakerPojo {
           FakerFieldProps fieldProps =
               PojoDataService.getDefaultFakerFieldProps().withType(fakerType);
 
+          PojoDataService.getRecursiveFieldMap().clear();
+
           return (T) PojoDataService.createFakeField(fieldProps, this.baseClass, null);
         }
       }
@@ -266,6 +268,8 @@ public class FakerPojo {
             i++;
           }
 
+          PojoDataService.getRecursiveFieldMap().clear();
+
           return outputList;
         }
       }
@@ -321,6 +325,8 @@ public class FakerPojo {
             outputList.add(fakeData);
             i++;
           }
+
+          PojoDataService.getRecursiveFieldMap().clear();
 
           return outputList;
         }
@@ -447,6 +453,8 @@ public class FakerPojo {
             }
           }
 
+          PojoDataService.getRecursiveFieldMap().clear();
+
           return outputMap;
         }
 
@@ -527,6 +535,8 @@ public class FakerPojo {
               i++;
             }
           }
+
+          PojoDataService.getRecursiveFieldMap().clear();
 
           return outputList;
         }
@@ -616,6 +626,8 @@ public class FakerPojo {
             outputList.addAll(additionalData);
           }
 
+          PojoDataService.getRecursiveFieldMap().clear();
+
           return outputList;
         }
       }
@@ -689,6 +701,8 @@ public class FakerPojo {
             }
           }
 
+          PojoDataService.getRecursiveFieldMap().clear();
+
           return outputList;
         }
       }
@@ -737,6 +751,8 @@ public class FakerPojo {
               return this.build(1);
             }
           }
+
+          PojoDataService.getRecursiveFieldMap().clear();
 
           return fakeData;
         }

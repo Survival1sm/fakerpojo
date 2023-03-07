@@ -209,6 +209,64 @@ class PojoBuilderTest {
   }
 
   @Test
+  void build_with_recursive_class_resets_for_each_instance() throws Exception {
+    RecursiveTestDomain recursiveTestDomainOne =
+        FakerPojo.Builder.fromPojo(RecursiveTestDomain.class).getFirst().build();
+    RecursiveTestDomain recursiveTestDomainTwo =
+        FakerPojo.Builder.fromPojo(RecursiveTestDomain.class).getFirst().build();
+    RecursiveTestDomain recursiveTestDomainThree =
+        FakerPojo.Builder.fromPojo(RecursiveTestDomain.class).getFirst().build();
+
+    assertEquals(1, recursiveTestDomainOne.getRecursiveTestDomainList().size());
+    assertEquals(
+        1,
+        recursiveTestDomainOne
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .size());
+    assertNull(
+        recursiveTestDomainOne
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList());
+
+    assertEquals(1, recursiveTestDomainTwo.getRecursiveTestDomainList().size());
+    assertEquals(
+        1,
+        recursiveTestDomainTwo
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .size());
+    assertNull(
+        recursiveTestDomainTwo
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList());
+
+    assertEquals(1, recursiveTestDomainThree.getRecursiveTestDomainList().size());
+    assertEquals(
+        1,
+        recursiveTestDomainThree
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .size());
+    assertNull(
+        recursiveTestDomainThree
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList()
+            .get(0)
+            .getRecursiveTestDomainList());
+  }
+
+  @Test
   void build_with_expression_generates_expected_expression_data() throws Exception {
     Instant start = Instant.now();
     ExpressionTestDomain expressionTestDomain =
