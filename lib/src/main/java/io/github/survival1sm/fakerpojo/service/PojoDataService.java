@@ -14,6 +14,7 @@ import io.github.survival1sm.fakerpojo.domain.FakerFieldProps;
 import io.github.survival1sm.fakerpojo.util.Utilities;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -127,7 +128,7 @@ public class PojoDataService {
           fieldDataList.put(
               field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
         }
-      } else {
+      } else if (!Modifier.isFinal(field.getModifiers())) {
         fieldDataList.put(
             field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
       }

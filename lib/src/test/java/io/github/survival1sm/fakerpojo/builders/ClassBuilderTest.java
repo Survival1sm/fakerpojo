@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.survival1sm.fakerpojo.FakerPojo;
+import io.github.survival1sm.fakerpojo.domain.SerializableClassTestDomain;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,5 +55,16 @@ class ClassBuilderTest {
   void build_first_integer_with_unique_throws_UnsupportedOperationException() {
     DataBuilder<Integer> test = FakerPojo.Builder.fromClass(Integer.class).getFirst();
     assertThrows(UnsupportedOperationException.class, () -> test.withUniqueOnKey(""));
+  }
+
+  @Test
+  void build_serializable_class_builds_class()
+      throws ParseException, NoSuchFieldException, ClassNotFoundException,
+          InvocationTargetException, InstantiationException, NoSuchMethodException,
+          IllegalAccessException {
+    SerializableClassTestDomain test =
+        FakerPojo.Builder.fromPojo(SerializableClassTestDomain.class).getFirst().build();
+
+    assertNotNull(test);
   }
 }
