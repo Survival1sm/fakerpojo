@@ -128,7 +128,8 @@ public class PojoDataService {
           fieldDataList.put(
               field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
         }
-      } else if (!Modifier.isFinal(field.getModifiers())) {
+      } else if ((!Modifier.isFinal(field.getModifiers()) && !baseClass.isRecord())
+          || baseClass.isRecord()) {
         fieldDataList.put(
             field, createFakeField(fieldProps.getValue(), fieldProps.getKey(), field));
       }

@@ -5,7 +5,7 @@ import io.github.survival1sm.fakerpojo.annotations.FakerField;
 public class UninimplementedFieldAnnotationTestDomain {
 
   @FakerField(type = TestTypes.UNIMPLEMENTED_TEST_TYPE)
-  private final String unimplementedGeneratorField;
+  private String unimplementedGeneratorField;
 
   public UninimplementedFieldAnnotationTestDomain(String unimplementedGeneratorField) {
     this.unimplementedGeneratorField = unimplementedGeneratorField;
